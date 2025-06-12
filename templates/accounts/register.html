@@ -1,0 +1,39 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+
+<form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" method="POST">
+    {% csrf_token %}
+    {% comment %} <div class="form-floating mb-3">
+        <label for="floatingUser"> UserName</label>
+        <input type="text" class="form-control" id="floatingUser" placeholder="UserName" name="username">
+
+    </div>
+
+    <div class="form-floating mb-3">
+        <label for="floatingInput">Email address</label>
+        <input type="email" class="form-control" id="floatingInput" placeholder="Your email" name="email">
+
+    </div>
+
+    <div class="form-floating mb-3">
+        <label for="floatingPassword">Password</label>
+        <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password1">
+
+    </div>
+    <div class="form-floating mb-3">
+        <label for="conformPassword"> Conform Password</label>
+        <input type="password" class="form-control" id="conformPassword" placeholder="Conform Password" name="password2">
+
+    </div> {% endcomment %}
+{{ form.as_p}}
+
+
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+    <hr class="my-4"> <small class="text-body-secondary"> <a href="{% url 'login' %}"> Already have an account. Click here!
+            here !</a> </small>
+</form>
+
+
+
+{% endblock content %}

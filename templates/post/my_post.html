@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+    <h5 class="card-header">MY POSTS</h5>
+    <div class="card-body">
+        <p class="card-text">      
+            These are all the post you have created 
+        </p>
+
+      <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Status</th>
+                <th scope="col">DatePosted</th>
+                <th scope="col">Actions</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in post %}
+
+                <tr>  
+                    <td>{{post.title}}</td>
+                    <td>
+                        {% if post.is_draft == 'True'%}
+                            <span class="badge  bg-warning"> Draft </span>
+                        {%else%}
+                            <span class="badge bg-success "> Published </span>
+        
+                        {% endif %}
+                    </td>
+                    <td> {{ post.date_posted}}</td>
+                    <td>
+                        <a href="{% url 'post-details' post.pk %}" class=" btn btn-secondary "> View Post </a>
+                        
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'update-post' post.pk %}"> Update </a></li>
+                                <li><a class="dropdown-item text-warning" href="{% url 'delete-post' post.pk %}"> Delete </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+             {% endfor %}
+    
+    
+        </tbody>
+    </table>
+
+
+    </div>
+</div>
+{% endblock %}
