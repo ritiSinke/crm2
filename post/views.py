@@ -66,7 +66,6 @@ def post_details(request,pk):
     context ={ 'post': post,}
     return render (request, 'post/post_details.html',context)
 
-
 #author posts
 def author_posts(request,pk):
    author = get_user_model().objects.get(pk=pk)
