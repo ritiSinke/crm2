@@ -36,11 +36,12 @@ class RegistrationCreateView(CreateView):
     template_name = 'accounts/register.html'	
     form_class = fm.RegistrationForm 
     success_url = reverse_lazy('login')
+
     def form_valid(self, form):
    
         self.object = form.save()
         messages.success(self.request,'Account created Succesfully')
-
+        
         return super().form_valid(form)
     
     def form_invalid(self, form):

@@ -28,7 +28,7 @@ class Post(models.Model):
         default ='True',
     )
     # is_published = models.BooleanField(default=False)   
-    scheduled_date = models.DateTimeField(null=True, blank=True)
+    # scheduled_date = models.DateTimeField(null=True, blank=True)
     image= models.ImageField( upload_to='images', null=True, blank=True)
 
 
