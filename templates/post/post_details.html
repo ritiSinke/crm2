@@ -6,13 +6,17 @@
     <div class="p-5 mb-4 bg-light rounded-3">
         <h1 class="display-5 fw-bold">{{post.title}}</h1> 
         <p class="col-md-8 fs-4"> 
-            <a href"#">{{post.category}}</a> | {{ post.date_posted }}
+            <a href"#"> {{post.category}} </a> | {{ post.date_posted }}
         </p>
-        <a href=" {%url 'like-post' post.pk %}" class="btn btn-primary btn-sm" type="button"> Like Post</a>
-        <span class="ms-2 ">( {{like_count.like_count}} Likes) </span>
+        {% if post.image %}
+        <img src="{{post.image.url}}" alt="NO Image"  style="max-height: 200px;"> 
+
+        {% endif %}
+       
         
     </div> 
         
+    <div>
 <p class="col-md-8 fs-4"> {{post.content}} </p>
 
 {% endblock%}
