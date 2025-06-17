@@ -136,3 +136,4 @@ def all_posts(request):
     # .order_by('-date_posted')
     return render(request, 'post/all_posts.html', {'post': posts})
 
+

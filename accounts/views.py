@@ -4,7 +4,9 @@ from django.contrib.auth import authenticate, login, logout
 from . import forms as fm 
 from django.contrib.auth.decorators import login_required 
 from django.views.generic import CreateView
-from django.views.generic import FormView 
+from django.views.generic import FormView
+from django.contrib.auth.views import LogoutView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponseRedirect
@@ -85,3 +87,10 @@ def logout_user(request):
     logout(request)
     messages.success(request,'Logged out successfully')
     return redirect ('login')
+
+# class CreateLogoutView(SuccessMessageMixin, LogoutView):
+#     redirect_field_name = 'login'
+#     next_page = reverse_lazy('login')
+#     success_message = "Logged out successfully"
+
+    
