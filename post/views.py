@@ -67,11 +67,9 @@ def post_details(request,pk):
 def author_posts(request,pk):
    author = get_user_model().objects.get(pk=pk)
    posts = Post.objects.filter(author=author)
-   breakpoint()
-   print(f"Debug - Author Info:")
-   print(f"Email: {author.email}")
-   print(f"Username: {author.username}")
-   context ={ 'author ':author, 'posts': posts}
+#    breakpoint()
+  
+   context ={ 'author':author, 'posts': posts}
    return render (request, 'post/author_post.html',context)
 
 
