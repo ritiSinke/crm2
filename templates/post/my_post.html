@@ -14,6 +14,7 @@
             <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Status</th>
+                <th scope="col"> Image </th>
                 <th scope="col">DatePosted</th>
                 <th scope="col">Actions</th>
 
@@ -32,6 +33,12 @@
         
                         {% endif %}
                     </td>
+                    <td>
+                        {% if post.image%}
+                             <img src={{ post.image.url }} style="max-height: 100px">
+                        {%else%}
+                             <img alt="No Image">
+                        {%endif%}
                     <td> {{ post.date_posted}}</td>
                     <td>
                         <a href="{% url 'post-details' post.pk %}" class=" btn btn-secondary "> View Post </a>
@@ -42,7 +49,7 @@
                             </button>
                             <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'update-post' post.pk %}"> Update </a></li>
-                                <li><a class="dropdown-item text-warning" href="{% url 'delete-post' post.pk %}"> Delete </a></li>
+                                <li><a class="dropdown-item " href="{% url 'delete-post' post.pk %}"> Delete </a></li>
                             </ul>
                         </div>
                     </td>

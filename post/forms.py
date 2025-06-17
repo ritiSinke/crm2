@@ -9,7 +9,7 @@ class AddPostForm(forms.ModelForm):
     class Meta:
         model = Post
         # use lai kun kun fields haru form ma dekhaucha bhanne kura garna parxa
-        fields =['title', 'content', 'category', 'is_draft', 'scheduled_date', 'image']
+        fields =['title', 'content', 'category', 'is_draft', 'image']
 
 
 
