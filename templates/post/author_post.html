@@ -3,12 +3,8 @@
 {% block content %}
 
 <div class="container mt-4">
-     <div class="alert alert-info">
-        <p>Author Email: {{ author.email }}</p>
-        <p>Author Username: {{ author.username }}</p>
-        <p>Author String Representation: {{ author }}</p>
-    </div>
-    <h2 class="mb-4">All Posts for {{author.username}}</h2>
+     
+    <h2 class="mb-4">All Posts for {{ author.username }}</h2>
     
     <div class="row g-4">
         {% for post in posts %}
