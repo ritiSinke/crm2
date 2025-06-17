@@ -11,15 +11,20 @@ from django.contrib.auth import get_user_model
 def add_post(request):
 
     if request.method == 'POST':
-        form = fm.AddPostForm(request.POST)
+        form = fm.AddPostForm(request.POST,request.FILES)
+        print(f"Files: {request.FILES}")  
         if form.is_valid():
             var= form.save(commit= False)
             var.author= request.user
+
+            print(f"Files: {request.FILES}")  
             var.save()
             messages.success(request,'Post has been created')
             return redirect( 'my-post')
  
         else:
+            print(f"Form errors: {form.errors}")  # Debug line
+
             messages.warning (request,'Post was not able to be created')
             return redirect ('add-post')
     else:
@@ -38,10 +43,11 @@ def update_post(request,pk):
         return redirect('dashboard')
     
     if request.method == 'POST':
-        form = fm.UpdatePostForm(request.POST, instance=post)
+        form = fm.UpdatePostForm(request.POST,request.FILES, instance=post)
         print(f"Form data received: {request.POST}")  # Debug line
 
         if form.is_valid():
+    
             form.save()
             messages.success(request,'Post updated')
             return redirect ('my-post')
@@ -58,6 +64,8 @@ def update_post(request,pk):
 #post details
 def post_details(request,pk):
     post = Post.objects.get(pk=pk)
+    print(f"Files: {request.FILES}")  
+
     like_count=PostLike.objects.filter(post=post).first()
     context ={ 'post': post, 'like_count':like_count}
     return render (request, 'post/post_details.html',context)
