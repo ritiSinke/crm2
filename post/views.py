@@ -4,20 +4,30 @@ from django.contrib.auth.decorators import login_required
 from . import forms as fm 
 from .models import Post, PostLike, Category
 from django.contrib.auth import get_user_model
+from django.views.generic import CreateView
+from django.urls import reverse_lazy 
 # Create your views here.
 
 #adding posts 
 @login_required
+
+class AddingPost(CreateView):
+    template_name="post/add-post.html"
+    success_url = reverse_lazy('my-post')
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
 def add_post(request):
 
     if request.method == 'POST':
         form = fm.AddPostForm(request.POST,request.FILES)
-        print(f"Files: {request.FILES}")  
+        # print(f"Files: {request.FILES}")  
         if form.is_valid():
             var= form.save(commit= False)
             var.author= request.user
 
-            print(f"Files: {request.FILES}")  
+            # print(f"Files: {request.FILES}")  
             var.save()
             messages.success(request,'Post has been created')
             return redirect( 'my-post')

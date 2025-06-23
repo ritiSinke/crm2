@@ -5,7 +5,7 @@ from . import forms as fm
 from django.contrib.auth.decorators import login_required 
 from django.views.generic import CreateView
 from django.views.generic import FormView
-from django.contrib.auth.views import LogoutView
+from django.contrib.auth.views import LogoutView, PasswordChangeView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
@@ -83,14 +83,30 @@ class LoginView(FormView):
 
 
 #logout_user
-def logout_user(request):
-    logout(request)
-    messages.success(request,'Logged out successfully')
-    return redirect ('login')
+# def logout_user(request):
+#     logout(request)
+#     messages.success(request,'Logged out successfully')
+#     return redirect ('login')
 
-# class CreateLogoutView(SuccessMessageMixin, LogoutView):
-#     redirect_field_name = 'login'
-#     next_page = reverse_lazy('login')
-#     success_message = "Logged out successfully"
+class CreateLogoutView(LogoutView):
 
+    def dispatch(self, request, *args, **kwargs):
+
+         logout(request) # user ko session end garxa 
+         next_page = reverse_lazy('login') #
+         messages.success(self.request,"Logout Successfully!")
+         return HttpResponseRedirect(next_page)
+    
+    
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name='accounts/change_password.html'
+    success_url=reverse_lazy( 'login')
+    form_class = fm.UserPasswordChangeForm
+
+    def form_valid(self,form):
+        
+        self.object = form.save()
+
+        messages.success(self.request,"Password Changed Successful")
+        return super().form_valid(form)    
     
