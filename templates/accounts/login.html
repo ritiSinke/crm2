@@ -19,9 +19,12 @@
 
  {{form.as_p}}
 
+    {% comment %} <small class="text-body-secondary"><a href="{% url 'forget_password' %}"> Forget Password!</a> </small> {% endcomment %}
     <button class="w-100 btn btn-lg btn-primary" type="submit">Login</button>
     <hr class="my-4"> <small class="text-body-secondary"><a href="{% url 'register' %}"> Don't  have a account. Click here
             ! </a> </small>
+
+    
 </form>
 
 {% endblock content %}

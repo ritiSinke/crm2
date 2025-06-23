@@ -11,6 +11,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.core.mail import send_mail
+from django.conf import settings
 # Create your views here.
 
 #register_user
@@ -42,9 +44,20 @@ class RegistrationCreateView(CreateView):
     def form_valid(self, form):
    
         self.object = form.save()
+
+         #  Send email after registration
+        send_mail(
+            subject='Welcome to Our Website!',
+            message=f'Hello {self.object.first_name or self.object.email},\n\nYour account has been created successfully!',
+            from_email= settings.EMAIL_HOST_USER ,
+            recipient_list=[self.object.email],
+            fail_silently=False
+        )
+        # print("📧 Sending welcome email to:", self.object.email)
+
         messages.success(self.request,'Account created Succesfully')
-        
         return super().form_valid(form)
+    
     
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
@@ -89,14 +102,15 @@ class LoginView(FormView):
 #     return redirect ('login')
 
 class CreateLogoutView(LogoutView):
+    next_page = reverse_lazy('login') 
 
     def dispatch(self, request, *args, **kwargs):
 
-         logout(request) # user ko session end garxa 
-         next_page = reverse_lazy('login') #
+        #  logout(request) # user ko session end garxa 
          messages.success(self.request,"Logout Successfully!")
-         return HttpResponseRedirect(next_page)
-    
+         return super().dispatch(request, *args, **kwargs)
+
+   
     
 class CustomPasswordChangeView(PasswordChangeView):
     template_name='accounts/change_password.html'
@@ -104,7 +118,7 @@ class CustomPasswordChangeView(PasswordChangeView):
     form_class = fm.UserPasswordChangeForm
 
     def form_valid(self,form):
-        
+
         self.object = form.save()
 
         messages.success(self.request,"Password Changed Successful")

@@ -143,8 +143,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # For testing emails
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_HOST_USER='ritisha.sinkemana021@apexcollege.edu.np'
+EMAIL_HOST_PASSWORD='edlcrfotywaklepi'
+EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 INTERNAL_IPS = [
     # ...
