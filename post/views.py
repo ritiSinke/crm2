@@ -72,8 +72,8 @@ def update_post(request,pk):
 #post details
 def post_details(request,pk):
     post = Post.objects.get(pk=pk)
-
-    context ={ 'post': post,}
+    likecount= PostLike.objects.filter(post=post).count()
+    context ={ 'post': post, 'like_count': likecount} 
     return render (request, 'post/post_details.html',context)
 
 #author posts
@@ -114,26 +114,26 @@ def my_post(request):
 
 
 # # like posts 
-# @login_required
-# def like_post(request,pk):
+@login_required
+def like_post(request,pk):
 
-#     post = Post.objects.get(pk=pk) 
-#     post_like_qs= PostLike.objects.filter(post=post, reader=request.user)
+    post = Post.objects.get(pk=pk) 
+    post_like_qs= PostLike.objects.filter(post=post, reader=request.user)
 
-#     if post_like_qs.exists():
-#         post_like=post_like_qs.first()
-#         if  post_like.reader == request.user:
-#           messages.warning(request,"Already iked")
-#           return redirect('post-details',post.pk)
+    if post_like_qs.exists():
+        post_like=post_like_qs.first()
+        if  post_like.reader == request.user:
+          messages.warning(request,"Already liked")
+          return redirect('post-details',post.pk)
 
-#         post_like.like_count= post_like.like_count + 1 
-#         post_like.save()
-#         messages.success(request,"Post liked")
-#         return  redirect('post-details',post.pk)                           
-#     else:
-#         PostLike.objects.create(reader=request.user, post=post, like_count=1)
-#         messages.success(request,"Post liked")
-#         return  redirect('post-details',post.pk)
+        post_like.like_count= post_like.like_count + 1 
+        post_like.save()
+        messages.success(request,"Post liked")
+        return  redirect('post-details',post.pk)                           
+    else:
+        PostLike.objects.create(reader=request.user, post=post, like_count=1)
+        messages.success(request,"Post liked")
+        return  redirect('post-details',post.pk)
 
 
 

@@ -12,7 +12,13 @@
         <img src="{{post.image.url}}" alt="NO Image"  style="max-height: 200px;"> 
 
         {% endif %}
-       
+
+
+        <div>
+         <a href="{% url 'like-post' post.pk %}" class="btn btn-primary btn-sm " type="button"> Like Post </a>
+
+         <span class="ms-1"> ( {{like_count}} Likes)</span>
+        </div>
         
     </div> 
         
