@@ -1,7 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from  django.contrib.auth import get_user_model 
-from django.core.exceptions import ValidationError
-from django.contrib.auth.forms import PasswordResetForm
+
 
 #  usercreationfrom  le naya user create garn am help garxa 
 # user creation ka lagi form banauna parxa
