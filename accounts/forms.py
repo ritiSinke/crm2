@@ -1,7 +1,8 @@
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from  django.contrib.auth import get_user_model 
-from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import PasswordResetForm
+from django import forms 
+
 
 #  usercreationfrom  le naya user create garn am help garxa 
 # user creation ka lagi form banauna parxa
@@ -36,16 +37,11 @@ class UserPasswordChangeForm(PasswordChangeForm):
             field.help_text = ''
 
 
-# class EmailValidationOnForgetPassword(PasswordResetForm):
-#     # template_name="accounts/forget_password.html"
 
-#     # success_url="accounts/password_reset_done.html"
-
-
-#     def form_valid(self, form):
-#      email= form.cleaned_date['email']
-#      User = get_user_model()
-#      if not User.objects.filter(email__iexact=email, is_active=True).exists():
-#             raise ValidationError("There is no user registered with the specified email address.")
-     
-#      return super().form_valid(form)   
+class CreatePasswordResetForm(PasswordResetForm):
+    def clean_email(self):
+        email=self.cleaned_data['email']
+        user=get_user_model()
+        if not user.objects.filter(email=email).exists():
+            raise forms.ValidationError ("Email Address is not registered")
+      

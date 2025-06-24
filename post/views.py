@@ -146,3 +146,13 @@ def all_posts(request):
     return render(request, 'post/all_posts.html', {'post': posts})
 
 
+def search_posts(request):
+    query = request.GET.get('q', '').strip()  # default to empty string and strip whitespace
+    
+
+    if query:
+        posts = Post.objects.filter(title__icontains=query)
+
+    context = {'query': query, 'posts': posts}
+
+    return render(request, 'post/search_posts.html', context)  
