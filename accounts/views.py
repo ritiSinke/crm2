@@ -1,19 +1,19 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout 
+from django.contrib.auth import authenticate, login, logout
 from . import forms as fm 
 from django.contrib.auth.decorators import login_required 
 from django.views.generic import CreateView
 from django.views.generic import FormView
-from django.contrib.auth.views import LogoutView, PasswordChangeView 
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LogoutView, PasswordChangeView
+from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.core.mail import send_mail
 from django.conf import settings
 from django.views import View
-
+from django.contrib.auth import get_user_model
 
 
 # Create your views here.
