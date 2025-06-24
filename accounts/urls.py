@@ -1,12 +1,28 @@
 from django.urls import path
 from . import views
 
+from django.contrib.auth.views import (
+   
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView
+   
+)
 urlpatterns=[
     # path('register/', views.register_user, name='register'),
     path('register/', views.RegistrationCreateView.as_view(), name='register'),
     path('login/', views.LoginView.as_view(), name='login'),
     # path('login/', views.login_user, name='login'),
-    path ('logout/', views.CreateLogoutView.as_view(), name='logout'),
-    path('change-password/', views.CustomPasswordChangeView.as_view(), name="changePassword"),
-]
+    path ('logout/', views.LogoutView.as_view(), name='logout'),
 
+    # user ko password change garn ako lagii 
+    path('change-password/', views.CustomPasswordChangeView.as_view(), name="changePassword"),
+
+    
+    path('forget-password/', PasswordResetView.as_view( template_name='accounts/forget_password.html'),name='forget-password'),
+    path('password-reset-done/', PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(template_name='accounts/password_reset_confirm.html'), name="password_reset_confirm"),
+    path('password-reset-complete/', PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'),name='password_reset_complete'),
+]   
+ 

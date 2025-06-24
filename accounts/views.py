@@ -5,12 +5,17 @@ from . import forms as fm
 from django.contrib.auth.decorators import login_required 
 from django.views.generic import CreateView
 from django.views.generic import FormView
-from django.contrib.auth.views import LogoutView, PasswordChangeView
-from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import LogoutView, PasswordChangeView 
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.core.mail import send_mail
+from django.conf import settings
+from django.views import View
+
+
+
 # Create your views here.
 
 #register_user
@@ -42,9 +47,20 @@ class RegistrationCreateView(CreateView):
     def form_valid(self, form):
    
         self.object = form.save()
+
+         #  Send email after registration
+        send_mail(
+            subject='Welcome to Our Website!',
+            message=f'Hello {self.object.first_name or self.object.email},\n\nYour account has been created successfully!',
+            from_email= settings.EMAIL_HOST_USER ,
+            recipient_list=[self.object.email],
+            fail_silently=False
+        )
+        # print(" Sending welcome email to:", self.object.email)
+
         messages.success(self.request,'Account created Succesfully')
-        
         return super().form_valid(form)
+    
     
     def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
@@ -88,25 +104,35 @@ class LoginView(FormView):
 #     messages.success(request,'Logged out successfully')
 #     return redirect ('login')
 
-class CreateLogoutView(LogoutView):
+#  to ket user logout from the system 
 
-    def dispatch(self, request, *args, **kwargs):
 
-         logout(request) # user ko session end garxa 
-         next_page = reverse_lazy('login') #
-         messages.success(self.request,"Logout Successfully!")
-         return HttpResponseRedirect(next_page)
-    
-    
+class LogoutView(View):
+    def get(self, request):
+        logout(request)
+        messages.success(request, "Logout Successfully!")
+        return redirect(reverse_lazy('login'))
+
+
+
 class CustomPasswordChangeView(PasswordChangeView):
     template_name='accounts/change_password.html'
     success_url=reverse_lazy( 'login')
     form_class = fm.UserPasswordChangeForm
 
     def form_valid(self,form):
-        
+
         self.object = form.save()
 
-        messages.success(self.request,"Password Changed Successful")
+        messages.success(self.request,"Password Changed Successfully")
         return super().form_valid(form)    
     
+
+
+    
+
+
+
+
+        
+      
