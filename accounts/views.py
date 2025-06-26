@@ -131,11 +131,18 @@ class CustomPasswordChangeView(PasswordChangeView):
         return super().form_valid(form)    
     
 
+# user ko profile update garna ko lagi
+class UpdateProfileView(View):
+    def get(self, request):
+        form = fm.UserProfileUpdateForm(instance=request.user)
+        return render(request, 'accounts/update_profile.html', {'form': form})
 
-    
-
-
-
-
-        
-      
+    def post(self, request):
+        form = fm.UserProfileUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully")
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Error updating profile")
+            return render(request, 'accounts/update_profile.html', {'form': form})

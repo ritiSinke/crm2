@@ -16,6 +16,8 @@ urlpatterns=[
     # path('login/', views.login_user, name='login'),
     path ('logout/', views.LogoutView.as_view(), name='logout'),
 
+    path('update-profile/', views.UpdateProfileView.as_view(), name='update_profile'),
+
     # user ko password change garn ako lagii 
     path('change-password/', views.CustomPasswordChangeView.as_view(), name="changePassword"),
 
