@@ -18,11 +18,9 @@
      <div class="mb-3">
     <a href="{% url 'like-post' post.pk %}" class="btn btn-primary btn-sm">Like Post</a>
 
-    <!-- Wrap the likes count and popup only in a relative container -->
     <span class="ms-2 position-relative d-inline-block" style="cursor: pointer;" id="likes-container">
         <span id="likes-count">( {{ like_count }} Likes)</span>
 
-        <!-- Liked-by popup -->
         <div id="likes-list" class="shadow-sm border bg-white p-2 rounded" style="
             display: none;
             position: absolute;
