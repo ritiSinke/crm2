@@ -25,7 +25,7 @@ class RegistrationForm(UserCreationForm):
             self.fields[field_name].help_text = ''
 
 
-
+# password change form for changing the password of the user
 class UserPasswordChangeForm(PasswordChangeForm):
     class Meta:
         model= User
@@ -45,3 +45,14 @@ class CreatePasswordResetForm(PasswordResetForm):
         if not user.objects.filter(email=email).exists():
             raise forms.ValidationError ("Email Address is not registered")
       
+
+class UserProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+            field.help_text = ''

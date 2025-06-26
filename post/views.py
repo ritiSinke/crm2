@@ -171,6 +171,7 @@ def all_posts(request):
         'is_author': is_author    # boolean flag
     })
 
+
    
 
 
