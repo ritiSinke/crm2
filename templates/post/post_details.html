@@ -6,23 +6,77 @@
     <div class="p-5 mb-4 bg-light rounded-3">
         <h1 class="display-5 fw-bold">{{post.title}}</h1> 
         <p class="col-md-8 fs-4"> 
-            <a href"#"> {{post.category}} </a> | {{ post.date_posted }}
+            <a href="#"> {{post.category}} </a> | {{ post.date_posted }}
         </p>
         {% if post.image %}
-        <img src="{{post.image.url}}" alt="NO Image"  style="max-height: 200px;"> 
+        <img src="{{post.image.url}}" alt="NO Image"  style="max-height: 200px;" class="mb-4"> 
 
         {% endif %}
 
 
-        <div>
-         <a href="{% url 'like-post' post.pk %}" class="btn btn-primary btn-sm " type="button"> Like Post </a>
 
-         <span class="ms-1"> ( {{like_count}} Likes)</span>
+     <div class="mb-3">
+    <a href="{% url 'like-post' post.pk %}" class="btn btn-primary btn-sm">Like Post</a>
+
+    <!-- Wrap the likes count and popup only in a relative container -->
+    <span class="ms-2 position-relative d-inline-block" style="cursor: pointer;" id="likes-container">
+        <span id="likes-count">( {{ like_count }} Likes)</span>
+
+        <!-- Liked-by popup -->
+        <div id="likes-list" class="shadow-sm border bg-white p-2 rounded" style="
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 180px;
+            z-index: 1000;
+            white-space: nowrap;">
+            Loading...
         </div>
+    </span>
+</div>
+
+
         
     </div> 
         
-    <div>
-<p class="col-md-8 fs-4"> {{post.content}} </p>
+    <div >
+        <p class="col-md-8 fs-4"> {{post.content}} </p>
+    </div>
+
+    <script>
+        document.getElementById('likes-count').onclick = function(event) {
+       
+        var container = document.getElementById('likes-list');
+
+        if (container.style.display === 'none') {
+            fetch("{% url 'post-likes' post.pk %}")
+            .then(function(response) {
+                if (!response.ok) throw new Error('Network error: ' + response.status);
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.likes.length === 0) {
+                    container.innerHTML = '<em>No likes yet.</em>';
+                } else {
+                    var html = '<strong>Liked by:</strong><ul style="padding-left: 15px;">';
+                    data.likes.forEach(function(like) {
+                        html += '<li>' + like.username + '</li>';
+                    });
+                    html += '</ul>';
+                    container.innerHTML = html;
+                }
+                container.style.display = 'block';
+            })
+            .catch(function(error) {
+                container.innerHTML = 'You have to login first to see who liked this post';
+                container.style.display = 'block';
+            });
+        } else {
+            container.style.display = 'none';
+        }
+     };
+
+</script>
 
 {% endblock%}

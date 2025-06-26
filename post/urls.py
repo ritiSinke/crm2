@@ -14,6 +14,7 @@ urlpatterns=[
     path('like-post/<int:pk>/', views.like_post, name='like-post'),
     path('author-post/<int:pk>/', views.author_posts, name='author-post'),
     path('search-post/',views.search_posts, name='search-post'),
+     path('post/<int:pk>/likes-json/', views.post_likes, name='post-likes'),
 
 ] + static( settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -7,6 +7,10 @@ from django.contrib.auth import get_user_model
 from django.views.generic import CreateView
 from django.urls import reverse_lazy 
 
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+
 # Create your views here.
 
 
@@ -142,6 +146,15 @@ def like_post(request,pk):
         return  redirect('post-details',post.pk)
 
 
+@login_required 
+@permission_required("post.view_postlike", "post-details")
+def post_likes(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    likes_qs = PostLike.objects.filter(post=post).select_related('reader')
+
+    likes = [{'username': like.reader.username} for like in likes_qs]
+
+    return JsonResponse({'likes': likes})
 
 
 # show all t post from db is the post is not draft 
