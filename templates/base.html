@@ -12,8 +12,10 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'dashboard' %}">  Blog  </a>
-            
+            {% comment %} @permission_required('core.v') {% endcomment %}
+        {% if request.user.is_authenticated and is_author %}     
+             <a class="navbar-brand" href="{% url 'dashboard' %}">  Blog  </a>
+         {% endif %}
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -31,6 +33,7 @@
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             {% comment %} <li> <a class="dropdown-item" href="{% url 'update-profile' %}"> Update Profile </a></li> {% endcomment %}
                             <li> <a class="dropdown-item" href="{% url 'changePassword' %}"> Change Password </a> </li>
+
                             <li> <a class="dropdown-item" aria-current="page" href="{% url 'logout' %}"> Logout   </a></li>
                         </ul>
                     </li>

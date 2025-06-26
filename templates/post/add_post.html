@@ -4,28 +4,9 @@
 <div class="card">
   <h5 class="card-header">ADD POST </h5>
   <div class="card-body">
-    <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" method="POST" enctype="multipart/form-data">
+    <form  method="POST" enctype="multipart/form-data">
       {% csrf_token %}
 
-        {% comment %} <div class="form-floating mb-3">
-        {% render_field form.title  class="form-control"%}
-        <label for="floatingInput"> Title  </label>
-      </div>
-
-      <div class="form-floating mb-3">
-        {% render_field form.category  class="form-control"%}
-        <label for="floatingInput">Category  </label>
-      </div>
-
-       <div class="form-floating mb-3">
-        {% render_field form.content  class="form-control"%}
-        <label for="floatingInput"> Content   </label>
-      </div>
-
-        <div class="form-floating mb-3">
-        {% render_field form.scheduled_date class="form-control"%}
-        <label for="floatingInput"> Schedule Release Date   </label>
-      </div> {% endcomment %}
       {{ form.as_p}}
          <button class="w-100 btn btn-lg btn-primary" type="submit">Create Post </button>
     

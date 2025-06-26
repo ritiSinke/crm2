@@ -72,10 +72,13 @@ class LoginView(FormView):
     form_class = AuthenticationForm
     success_url = reverse_lazy('dashboard')
 
+
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
-        return HttpResponseRedirect(self.get_success_url())
-    
+        if  self.request.user.groups.filter(name='author').exists():
+         return HttpResponseRedirect(self.get_success_url())
+        else:
+            return HttpResponseRedirect(reverse_lazy('all-posts'))    
     def form_invalid(self, form):
      return self.render_to_response(self.get_context_data(form=form))
 

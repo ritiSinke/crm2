@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'core.middleware.access_control.RoleAccessControlMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -152,6 +153,8 @@ EMAIL_HOST_PASSWORD='edlcrfotywaklepi'
 EMAIL_USE_TLS = True
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
 
 INTERNAL_IPS = [
     # ...
