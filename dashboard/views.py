@@ -10,7 +10,9 @@ from post.models import Post
 def dashboard(request):
     is_author=False
 
-    if not request.user.groups.filter(name='author').exists():
+    if request.user.groups.filter(name='author').exists():
+        is_author = True
+    else:
         return redirect('all-posts')
     return render(request, 'dashboard/dashboard.html',{
         'is_author': is_author

@@ -7,6 +7,10 @@ from django.contrib.auth import get_user_model
 from django.views.generic import CreateView
 from django.urls import reverse_lazy 
 
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+
 # Create your views here.
 
 
@@ -41,7 +45,7 @@ def add_post(request):
             return redirect ('add-post')
     else:
         form = fm.PostForm()
-        context ={ 'form':form}
+        context ={ 'form':form, 'is_author': request.user.groups.filter(name='author').exists()}
     return render(request,'post/add_post.html', context)
     
 
@@ -70,7 +74,7 @@ def update_post(request,pk):
         
     else:
         form =fm.PostForm(instance=post)
-        context ={ 'form' : form, 'post': post}
+        context ={ 'form' : form, 'post': post, 'is_author': request.user.groups.filter(name='author').exists()}
     return render(request,'post/add_post.html',context)
     
 
@@ -114,7 +118,7 @@ def author_posts(request,pk):
 @login_required
 def my_post(request):
     post= Post.objects.filter(author=request.user)
-    context ={ 'post': post}
+    context ={ 'post': post, 'is_author': request.user.groups.filter(name='author').exists()}
     return render(request, 'post/my_post.html', context)
 
 
@@ -142,6 +146,15 @@ def like_post(request,pk):
         return  redirect('post-details',post.pk)
 
 
+@login_required 
+@permission_required("post.view_postlike", "post-details")
+def post_likes(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    likes_qs = PostLike.objects.filter(post=post).select_related('reader')
+
+    likes = [{'username': like.reader.username} for like in likes_qs]
+
+    return JsonResponse({'likes': likes})
 
 
 # show all t post from db is the post is not draft 

@@ -8,8 +8,12 @@
       {% csrf_token %}
 
       {{ form.as_p}}
+      
+      {% if post %}
+               <button class="w-100 btn btn-lg btn-primary" type="submit">Update Post </button>
+      {% else %}
          <button class="w-100 btn btn-lg btn-primary" type="submit">Create Post </button>
-    
+    {% endif %}
 
     </form>
 

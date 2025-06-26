@@ -10,10 +10,10 @@ class PostForm(forms.ModelForm):
         model = Post
         # use lai kun kun fields haru form ma dekhaucha bhanne kura garna parxa
         fields =['title', 'content', 'category', 'is_draft', 'image']
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     for field_name,field in self.fields.items():
-    #         field.widget.attrs['class']='form-control'
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name,field in self.fields.items():
+            field.widget.attrs['class']='form-control'
            
 
 
