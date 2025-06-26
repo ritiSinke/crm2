@@ -2,26 +2,33 @@
 
 {% block content %}
 
+
 <div class="col-lg-7 p-3 p-lg-5 pt-lg-3"> 
-     
-    <h1 class="display-4 fw-bold lh-1 text-body-emphasis"> BLOG </h1>
-     <p class="lead">Blog info.</p>
-     {%  if not request.user.is_authenticated %}  
-        <a href=" {% url 'register'%}"> <button type="button" class="btn btn-primary btn-lg px-4 me-md-2 "> Start Creating </button> </a>
-        
-     {% else %}
-       <a href=" {%url 'add-post' %}"> <button type="button" class="btn btn-outline-secondary btn-lg px-4"> Add Post  </button> </a>
-      
+
+    {% if is_author %}
+        <h1 class="display-4 fw-bold lh-1 text-body-emphasis">BLOG</h1>
+        <p class="lead">Blog info.</p>
+        <a href="{% url 'add-post' %}">
+            <button type="button" class="btn btn-outline-secondary btn-lg px-4">Add Post</button>
+        </a>
+    
+    {% elif not request.user.is_authenticated %}
+        <h1 class="display-4 fw-bold lh-1 text-body-emphasis">BLOG</h1>
+        <p class="lead">Blog info.</p>
+        <a href="{% url 'register' %}">
+            <button type="button" class="btn btn-primary btn-lg px-4 me-md-2">Start Creating</button>
+        </a>
     {% endif %}
-     </div> 
-    </div> 
+</div>
+   
+
 
 
 <div class="container mt-4">
     <h2 class="mb-4"> Posts</h2>
     
     <div class="row g-4">
-        {% for post in post %}
+        {% for post in posts %}
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">

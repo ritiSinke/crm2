@@ -1,27 +1,30 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,permission_required
 from . import forms as fm 
 from .models import Post, PostLike, Category
 from django.contrib.auth import get_user_model
 from django.views.generic import CreateView
 from django.urls import reverse_lazy 
+
 # Create your views here.
+
+
+
+# class AddingPost(CreateView):
+#     template_name="post/add-post.html"
+#     success_url = reverse_lazy('my-post')
+
+#     def form_invalid(self, form):
+#         return self.render_to_response(self.get_context_data(form=form))
 
 #adding posts 
 @login_required
-
-class AddingPost(CreateView):
-    template_name="post/add-post.html"
-    success_url = reverse_lazy('my-post')
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
+@permission_required("post.add_post","all-posts")
 def add_post(request):
 
     if request.method == 'POST':
-        form = fm.AddPostForm(request.POST,request.FILES)
+        form = fm.PostForm(request.POST,request.FILES)
         # print(f"Files: {request.FILES}")  
         if form.is_valid():
             var= form.save(commit= False)
@@ -37,22 +40,24 @@ def add_post(request):
             messages.warning (request,'Post was not able to be created')
             return redirect ('add-post')
     else:
-        form = fm.AddPostForm()
+        form = fm.PostForm()
         context ={ 'form':form}
     return render(request,'post/add_post.html', context)
     
 
 #updating posts 
 @login_required
+@permission_required("post.change_post","all-posts")
 def update_post(request,pk):
     post = Post.objects.get(pk=pk)
 
     if not post.author == request.user:
         messages.warning(request,"Permission denied")
-        return redirect('dashboard')
+        return redirect('my-post')
     
+
     if request.method == 'POST':
-        form = fm.UpdatePostForm(request.POST,request.FILES, instance=post)
+        form = fm.PostForm(request.POST,request.FILES, instance=post)
 
         if form.is_valid():
     
@@ -64,31 +69,14 @@ def update_post(request,pk):
             return redirect('update-post', post.pk)
         
     else:
-        form =fm.UpdatePostForm(instance=post)
+        form =fm.PostForm(instance=post)
         context ={ 'form' : form, 'post': post}
-    return render(request,'post/update_post.html',context)
+    return render(request,'post/add_post.html',context)
     
-
-#post details
-def post_details(request,pk):
-    post = Post.objects.get(pk=pk)
-    likecount= PostLike.objects.filter(post=post).count()
-    context ={ 'post': post, 'like_count': likecount} 
-    return render (request, 'post/post_details.html',context)
-
-#author posts
-def author_posts(request,pk):
-   author = get_user_model().objects.get(pk=pk)
-   posts = Post.objects.filter(author=author, is_draft='False')
-#    breakpoint()
-  
-   context ={ 'author':author, 'posts': posts}
-   return render (request, 'post/author_post.html',context)
-
-
 
 # deleting posts
 @login_required
+@permission_required("post.delete_post","all-posts")
 def delete_post(request,pk):
     post= Post.objects.get(pk=pk)
 
@@ -101,15 +89,33 @@ def delete_post(request,pk):
     return redirect('my-post')
 
 
+
+#post details
+def post_details(request,pk):
+    post = Post.objects.get(pk=pk)
+    likecount= PostLike.objects.filter(post=post).count()
+    context ={ 'post': post, 'like_count': likecount} 
+    return render (request, 'post/post_details.html',context)
+
+
+
+#author posts
+def author_posts(request,pk):
+   author = get_user_model().objects.get(pk=pk)
+   posts = Post.objects.filter(author=author, is_draft='False')
+#    breakpoint()
+  
+   context ={ 'author':author, 'posts': posts}
+   return render (request, 'post/author_post.html',context)
+
+
+
+
 @login_required
 def my_post(request):
     post= Post.objects.filter(author=request.user)
     context ={ 'post': post}
     return render(request, 'post/my_post.html', context)
-
-
-
-
 
 
 
@@ -138,14 +144,24 @@ def like_post(request,pk):
 
 
 
-
+# show all t post from db is the post is not draft 
 def all_posts(request):
-    posts = Post.objects.filter(is_draft='False').order_by('-date_posted')      # Get all posts, newest first
+    is_author = False
 
-    # .order_by('-date_posted')
-    return render(request, 'post/all_posts.html', {'post': posts})
+    if request.user.is_authenticated:
+        is_author = request.user.groups.filter(name='author').exists()
+
+    posts = Post.objects.filter(is_draft=False).order_by('-date_posted')
+
+    return render(request, 'post/all_posts.html', {
+        'posts': posts,           
+        'is_author': is_author    # boolean flag
+    })
+
+   
 
 
+# searching posts 
 def search_posts(request):
     query = request.GET.get('q', '').strip()  # default to empty string and strip whitespace
     
