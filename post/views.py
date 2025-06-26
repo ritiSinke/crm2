@@ -41,7 +41,7 @@ def add_post(request):
             return redirect ('add-post')
     else:
         form = fm.PostForm()
-        context ={ 'form':form}
+        context ={ 'form':form, 'is_author': request.user.groups.filter(name='author').exists()}
     return render(request,'post/add_post.html', context)
     
 
@@ -70,7 +70,7 @@ def update_post(request,pk):
         
     else:
         form =fm.PostForm(instance=post)
-        context ={ 'form' : form, 'post': post}
+        context ={ 'form' : form, 'post': post, 'is_author': request.user.groups.filter(name='author').exists()}
     return render(request,'post/add_post.html',context)
     
 
@@ -114,7 +114,7 @@ def author_posts(request,pk):
 @login_required
 def my_post(request):
     post= Post.objects.filter(author=request.user)
-    context ={ 'post': post}
+    context ={ 'post': post, 'is_author': request.user.groups.filter(name='author').exists()}
     return render(request, 'post/my_post.html', context)
 
 
