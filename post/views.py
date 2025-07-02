@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-
+from .forms import CommentForm
 # Create your views here.
 
 
@@ -98,8 +98,36 @@ def delete_post(request,pk):
 def post_details(request,pk):
     post = Post.objects.get(pk=pk)
     likecount= PostLike.objects.filter(post=post).count()
-    context ={ 'post': post, 'like_count': likecount} 
-    return render (request, 'post/post_details.html',context)
+    comments = post.comments.all().order_by('-date_posted')
+    form=CommentForm()
+
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.author = request.user  # This sets the comment's author to the logged-in user
+
+                comment.post = post
+                comment.save()
+                return redirect('post-details', pk=post.pk)
+            else:
+            # Optionally, show a message or redirect to login
+                print(form.errors)
+                return redirect('login')
+        else:
+            form=CommentForm()
+            messages.warning(request, "You must be logged in to comment")
+
+    context = {
+        'post': post,
+        'comments': comments,
+        'like_count': likecount,
+        'form': form,
+    }
+    return render(request, 'post/post_details.html', context)       
+    # context ={ 'post': post, 'like_count': likecount} 
+    # return render (request, 'post/post_details.html',context)
 
 
 

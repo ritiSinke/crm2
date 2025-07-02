@@ -40,9 +40,36 @@
         
     </div> 
         
-    <div >
-        <p class="col-md-8 fs-4"> {{post.content}} </p>
+    <div  class="row">
+        <div class="col-md-7">
+
+            <p class="col-md-8 fs-4"> {{post.content}} </p>
+        </div>
+
+        <div class="col-md-5">
+            <h5>Comments</h5>
+            {% for comment in comments %}
+                <div class="mb-2">
+                    <strong>{{ comment.author.username }}</strong> ({{ comment.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
+                    {{ comment.content }}
+                </div>
+            {% empty %}
+            <p>No comments yet.</p>
+             {% endfor %}
+
+        {% if user.is_authenticated %}
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary btn-sm" type="submit">Add Comment</button>
+            </form>
+        {% else %}
+            <p><a href="{% url 'login' %}">Login</a> to comment.</p>
+        {% endif %}
     </div>
+
+    </div>
+    
 
     <script>
         document.getElementById('likes-count').onclick = function(event) {
