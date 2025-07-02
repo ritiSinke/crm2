@@ -146,3 +146,4 @@ class UpdateProfileView(View):
         else:
             messages.error(request, "Error updating profile")
             return render(request, 'accounts/update_profile.html', {'form': form})
+        
