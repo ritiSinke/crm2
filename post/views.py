@@ -110,6 +110,7 @@ def post_details(request,pk):
 
                 comment.post = post
                 comment.save()
+                print(form.errors)
                 return redirect('post-details', pk=post.pk)
             else:
             # Optionally, show a message or redirect to login
