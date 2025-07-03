@@ -44,6 +44,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     date_posted = models.DateTimeField(auto_now_add=True)
+    parents=models.ForeignKey('self', on_delete=models.CASCADE, related_name='replies',blank=True, null=True)
 
-    def __str__(self):
-        return f"{self.author.username} - {self.content[:20]}"
+
+

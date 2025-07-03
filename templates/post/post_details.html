@@ -46,14 +46,32 @@
 
         <div class="col-md-5">
             <h5>Comments</h5>
-            {% for comment in comments %}
-                <div class="mb-2">
-                    <strong>{{ comment.author.username }}</strong> ({{ comment.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
-                    {{ comment.content }}
-                </div>
-            {% empty %}
+          {% for comment in comments %}
+            <div class="mb-2">
+                <strong>{{ comment.author.username }}</strong> ({{ comment.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
+                {{ comment.content }}
+
+                {% if user.is_authenticated %}
+                    <button class="btn btn-link btn-sm p-0" type="button" onclick="toggleReplyForm({{ comment.id }})">Reply</button>
+                    <form method="POST" id="reply-form-{{ comment.id }}" style="display:none; margin-top:10px;">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        <button class="btn btn-primary btn-sm" type="submit">Add Reply</button>
+                    </form>
+                {% endif %}
+
+                {% for reply in comment.replies.all %}
+                    <div class="ms-3 mt-2 border-start ps-2">
+                        <strong>{{ reply.author.username }}</strong> ({{ reply.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
+                        {{ reply.content }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% empty %}
             <p>No comments yet.</p>
-             {% endfor %}
+        {% endfor %}
+
 
         {% if user.is_authenticated %}
             <form method="POST">
@@ -66,7 +84,6 @@
         {% endif %}
     </div>
 
-    </div>
     
 
     <script>
@@ -101,6 +118,17 @@
             container.style.display = 'none';
         }
      };
+
+
+function toggleReplyForm(commentId) {
+    var form = document.getElementById('reply-form-' + commentId);
+    if (form.style.display === "none") {
+        form.style.display = "block";
+    } else {
+        form.style.display = "none";
+    }
+}
+
 
 </script>
 

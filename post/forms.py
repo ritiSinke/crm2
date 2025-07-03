@@ -1,5 +1,6 @@
 from django import forms
-from .models import Post 
+from .models import Post ,Comment
+
 
 
 #  model form helps to create a form based on the model fields
@@ -17,7 +18,7 @@ class PostForm(forms.ModelForm):
            
 class CommentForm(forms.ModelForm):
     class Meta:
-        model = Post
+        model = Comment 
         fields = ['content']
     
     def __init__(self, *args, **kwargs):
