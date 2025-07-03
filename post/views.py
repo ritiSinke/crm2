@@ -98,9 +98,12 @@ def delete_post(request,pk):
 def post_details(request,pk):
     post = Post.objects.get(pk=pk)
     likecount= PostLike.objects.filter(post=post).count()
-    comments = post.comments.all().order_by('-date_posted')
+    comments = post.comments.filter(parents__isnull=True).order_by('-date_posted')
     form=CommentForm()
 
+    parent_comment=None
+
+   
     if request.method == 'POST':
         if request.user.is_authenticated:
             form = CommentForm(request.POST)
@@ -109,12 +112,16 @@ def post_details(request,pk):
                 comment.author = request.user  # This sets the comment's author to the logged-in user
 
                 comment.post = post
+
+                parent_id = request.POST.get('parent_id')
+                if parent_id:
+                     comment.parents_id= int (parent_id)
+
                 comment.save()
                 print(form.errors)
                 return redirect('post-details', pk=post.pk)
             else:
-            # Optionally, show a message or redirect to login
-                print(form.errors)
+           
                 return redirect('login')
         else:
             form=CommentForm()
