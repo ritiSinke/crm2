@@ -16,7 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.conf import settings
+from django.conf.urls.static import static
+import os
+from pathlib import Path
 from debug_toolbar.toolbar import debug_toolbar_urls
+
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 urlpatterns = [
 
@@ -26,5 +34,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
 ] + debug_toolbar_urls()
+
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=os.path.join(BASE_DIR, 'static'))
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

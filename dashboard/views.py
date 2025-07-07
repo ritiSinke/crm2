@@ -8,12 +8,5 @@ from post.models import Post
 
 @login_required
 def dashboard(request):
-    is_author=False
-
-    if request.user.groups.filter(name='author').exists():
-        is_author = True
-    else:
-        return redirect('all-posts')
-    return render(request, 'dashboard/dashboard.html',{
-        'is_author': is_author
-    })
+     return redirect('all-posts')
+  

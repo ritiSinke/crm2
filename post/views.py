@@ -2,15 +2,14 @@ from django.shortcuts import render, redirect
 from django.contrib import messages 
 from django.contrib.auth.decorators import login_required,permission_required
 from . import forms as fm 
-from .models import Post, PostLike, Category
+from .models import Post, PostLike,Comment, Category
 from django.contrib.auth import get_user_model
-from django.views.generic import CreateView
+from django.views.generic import FormView, ListView
 from django.urls import reverse_lazy 
 
 from django.http import JsonResponse
-from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from .forms import CommentForm
+from .forms import CommentForm,ContactForm
 # Create your views here.
 
 
@@ -78,6 +77,7 @@ def update_post(request,pk):
     return render(request,'post/add_post.html',context)
     
 
+
 # deleting posts
 @login_required
 @permission_required("post.delete_post","all-posts")
@@ -101,7 +101,6 @@ def post_details(request,pk):
     comments = post.comments.filter(parents__isnull=True).order_by('-date_posted')
     form=CommentForm()
 
-    parent_comment=None
 
    
     if request.method == 'POST':
@@ -161,25 +160,21 @@ def my_post(request):
 
 # # like posts 
 @login_required
-def like_post(request,pk):
-
+@permission_required("post.add_postlike", raise_exception=True)
+def like_post(request, pk):
     post = Post.objects.get(pk=pk) 
-    post_like_qs= PostLike.objects.filter(post=post, reader=request.user)
+    post_like_qs = PostLike.objects.filter(post=post, reader=request.user)
 
     if post_like_qs.exists():
-        post_like=post_like_qs.first()
-        if  post_like.reader == request.user:
-          messages.warning(request,"Already liked")
-          return redirect('post-details',post.pk)
-
-        post_like.like_count= post_like.like_count + 1 
-        post_like.save()
-        messages.success(request,"Post liked")
-        return  redirect('post-details',post.pk)                           
+        # Since user already liked, just show warning and redirect
+        messages.warning(request, "Already liked")
+        return redirect('post-details', post.pk)
     else:
+        # Create new like entry
         PostLike.objects.create(reader=request.user, post=post, like_count=1)
-        messages.success(request,"Post liked")
-        return  redirect('post-details',post.pk)
+        messages.success(request, "Post liked")
+        return redirect('post-details', post.pk)
+
 
 
 @login_required 
@@ -200,12 +195,23 @@ def all_posts(request):
     if request.user.is_authenticated:
         is_author = request.user.groups.filter(name='author').exists()
 
+    from django.db.models import Count
     posts = Post.objects.filter(is_draft=False).order_by('-date_posted')
+    categories = Category.objects.all()
+    posts = posts.annotate(comment_count=Count('comments'))
+    trending_posts = Post.objects.filter(is_draft=False) \
+                        .annotate(num_comments=Count('comments')) \
+                        .filter(num_comments__gt=0) \
+                        .order_by('-num_comments')[:5]
 
     return render(request, 'post/all_posts.html', {
-        'posts': posts,           
-        'is_author': is_author    # boolean flag
+        'posts': posts,
+        'is_author': is_author,
+        'categories' : categories,
+        'trending_posts': trending_posts
     })
+
+
 
 
    
@@ -222,3 +228,38 @@ def search_posts(request):
     context = {'query': query, 'posts': posts}
 
     return render(request, 'post/search_posts.html', context)  
+
+
+# contact page viewing 
+class ContactView(FormView):
+    template_name = 'post/staticPages/contact.html'
+    form_class = ContactForm
+    success_url = reverse_lazy('contact')
+    
+    def form_valid(self, form):
+       
+       self.object = form.save()
+       messages.success(self.request, "Your message has been sent successfully!")
+       return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, "There was an error sending your message. Please try again.")
+        return super().form_invalid(form)
+   
+
+#  to get category posts
+class CategoryPostsView(ListView):
+    model = Post
+    template_name = 'post/category_posts.html'  # your template
+    context_object_name = 'posts'
+    paginate_by = 10  # optional, if you want pagination
+
+    def get_queryset(self):
+        category_pk = self.kwargs.get('pk')
+        category = get_object_or_404(Category, pk=category_pk)
+        return Post.objects.filter(category=category, is_draft=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = get_object_or_404(Category, pk=self.kwargs.get('pk'))
+        return context

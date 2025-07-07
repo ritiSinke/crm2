@@ -27,8 +27,7 @@ class Post(models.Model):
         ),
         default ='True',
     )
-    # is_published = models.BooleanField(default=False)   
-    # scheduled_date = models.DateTimeField(null=True, blank=True)
+   
     image= models.ImageField( upload_to='images', null=True, blank=True)
 
 
@@ -45,6 +44,15 @@ class Comment(models.Model):
     content = models.TextField()
     date_posted = models.DateTimeField(auto_now_add=True)
     parents=models.ForeignKey('self', on_delete=models.CASCADE, related_name='replies',blank=True, null=True)
+
+
+class Contact(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    date_sent = models.DateTimeField(auto_now_add=True)
+
 
 
 

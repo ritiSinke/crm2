@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post ,Comment
+from .models import Post ,Comment, Contact
 
 
 
@@ -26,3 +26,13 @@ class CommentForm(forms.ModelForm):
         for field_name,field in self.fields.items():
             field.widget.attrs['class']='form-control'
 
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Contact
+        fields = ['name', 'email', 'subject', 'message']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name,field in self.fields.items():
+            field.widget.attrs['class']='form-control'
