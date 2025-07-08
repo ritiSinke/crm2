@@ -2,15 +2,14 @@ from django.shortcuts import render, redirect
 from django.contrib import messages 
 from django.contrib.auth.decorators import login_required,permission_required
 from . import forms as fm 
-from .models import Post, PostLike, Category
+from .models import Post, PostLike,Comment, Category
 from django.contrib.auth import get_user_model
-from django.views.generic import CreateView
+from django.views.generic import FormView, ListView
 from django.urls import reverse_lazy 
-
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
-from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-
+from .forms import CommentForm,ContactForm
 # Create your views here.
 
 
@@ -24,7 +23,8 @@ from django.shortcuts import get_object_or_404
 
 #adding posts 
 @login_required
-@permission_required("post.add_post","all-posts")
+# @user_passes_test(lambda u: u.is_staff)
+# @staff_member_required
 def add_post(request):
 
     if request.method == 'POST':
@@ -37,7 +37,7 @@ def add_post(request):
             # print(f"Files: {request.FILES}")  
             var.save()
             messages.success(request,'Post has been created')
-            return redirect( 'my-post')
+            return redirect( 'admin_posts')
  
         else:
 
@@ -51,15 +51,10 @@ def add_post(request):
 
 #updating posts 
 @login_required
-@permission_required("post.change_post","all-posts")
 def update_post(request,pk):
     post = Post.objects.get(pk=pk)
 
-    if not post.author == request.user:
-        messages.warning(request,"Permission denied")
-        return redirect('my-post')
-    
-
+  
     if request.method == 'POST':
         form = fm.PostForm(request.POST,request.FILES, instance=post)
 
@@ -67,7 +62,7 @@ def update_post(request,pk):
     
             form.save()
             messages.success(request,'Post updated')
-            return redirect ('my-post')
+            return redirect ('admin_post')
         else:
             messages.warning(request, 'Post unable to update')
             return redirect('update-post', post.pk)
@@ -78,19 +73,17 @@ def update_post(request,pk):
     return render(request,'post/add_post.html',context)
     
 
+
 # deleting posts
 @login_required
-@permission_required("post.delete_post","all-posts")
 def delete_post(request,pk):
     post= Post.objects.get(pk=pk)
 
-    if not post.author == request.user:
-        messages.warning(request,"Permission denied")
-        return redirect('dashboard')
+    
     
     post.delete()
     messages.success(request,"Post deleted")
-    return redirect('my-post')
+    return redirect('admin_post')
 
 
 
@@ -98,8 +91,43 @@ def delete_post(request,pk):
 def post_details(request,pk):
     post = Post.objects.get(pk=pk)
     likecount= PostLike.objects.filter(post=post).count()
-    context ={ 'post': post, 'like_count': likecount} 
-    return render (request, 'post/post_details.html',context)
+    comments = post.comments.filter(parents__isnull=True).order_by('-date_posted')
+    form=CommentForm()
+
+
+   
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.author = request.user  # This sets the comment's author to the logged-in user
+
+                comment.post = post
+
+                parent_id = request.POST.get('parent_id')
+                if parent_id:
+                     comment.parents_id= int (parent_id)
+
+                comment.save()
+                print(form.errors)
+                return redirect('post-details', pk=post.pk)
+            else:
+           
+                return redirect('login')
+        else:
+            form=CommentForm()
+            messages.warning(request, "You must be logged in to comment")
+
+    context = {
+        'post': post,
+        'comments': comments,
+        'like_count': likecount,
+        'form': form,
+    }
+    return render(request, 'post/post_details.html', context)       
+    # context ={ 'post': post, 'like_count': likecount} 
+    # return render (request, 'post/post_details.html',context)
 
 
 
@@ -125,29 +153,24 @@ def my_post(request):
 
 # # like posts 
 @login_required
-def like_post(request,pk):
 
+def like_post(request, pk):
     post = Post.objects.get(pk=pk) 
-    post_like_qs= PostLike.objects.filter(post=post, reader=request.user)
+    post_like_qs = PostLike.objects.filter(post=post, reader=request.user)
 
     if post_like_qs.exists():
-        post_like=post_like_qs.first()
-        if  post_like.reader == request.user:
-          messages.warning(request,"Already liked")
-          return redirect('post-details',post.pk)
-
-        post_like.like_count= post_like.like_count + 1 
-        post_like.save()
-        messages.success(request,"Post liked")
-        return  redirect('post-details',post.pk)                           
+        # Since user already liked, just show warning and redirect
+        messages.warning(request, "Already liked")
+        return redirect('post-details', post.pk)
     else:
+        # Create new like entry
         PostLike.objects.create(reader=request.user, post=post, like_count=1)
-        messages.success(request,"Post liked")
-        return  redirect('post-details',post.pk)
+        messages.success(request, "Post liked")
+        return redirect('post-details', post.pk)
+
 
 
 @login_required 
-@permission_required("post.view_postlike", "post-details")
 def post_likes(request, pk):
     post = get_object_or_404(Post, pk=pk)
     likes_qs = PostLike.objects.filter(post=post).select_related('reader')
@@ -164,12 +187,24 @@ def all_posts(request):
     if request.user.is_authenticated:
         is_author = request.user.groups.filter(name='author').exists()
 
+    from django.db.models import Count
     posts = Post.objects.filter(is_draft=False).order_by('-date_posted')
+    categories = Category.objects.all()
+    posts = posts.annotate(comment_count=Count('comments'))
+    trending_posts = Post.objects.filter(is_draft=False) \
+                        .annotate(num_comments=Count('comments')) \
+                        .filter(num_comments__gt=0) \
+                        .order_by('-num_comments')[:5]
 
     return render(request, 'post/all_posts.html', {
-        'posts': posts,           
-        'is_author': is_author    # boolean flag
+        'posts': posts,
+        'is_author': is_author,
+        'categories' : categories,
+        'trending_posts': trending_posts
     })
+
+
+
 
    
 
@@ -185,3 +220,58 @@ def search_posts(request):
     context = {'query': query, 'posts': posts}
 
     return render(request, 'post/search_posts.html', context)  
+
+
+# contact page viewing 
+class ContactView(FormView):
+    template_name = 'post/staticPages/contact.html'
+    form_class = ContactForm
+    success_url = reverse_lazy('contact')
+    
+    def form_valid(self, form):
+       
+       self.object = form.save()
+       messages.success(self.request, "Your message has been sent successfully!")
+       return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, "There was an error sending your message. Please try again.")
+        return super().form_invalid(form)
+   
+
+#  to get category posts
+class CategoryPostsView(ListView):
+    model = Post
+    template_name = 'post/category_posts.html'  # your template
+    context_object_name = 'posts'
+    paginate_by = 10  # optional, if you want pagination
+
+    def get_queryset(self):
+        category_pk = self.kwargs.get('pk')
+        category = get_object_or_404(Category, pk=category_pk)
+        return Post.objects.filter(category=category, is_draft=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = get_object_or_404(Category, pk=self.kwargs.get('pk'))
+        return context
+    
+
+
+
+
+class AdminPostView(ListView):
+
+    template_name='dashboard/list_posts.html'
+    model=Post 
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        
+        return Post.objects.filter(is_draft=False).order_by('-date_posted')
+
+    
+
+
+
+    

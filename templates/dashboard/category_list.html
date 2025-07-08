@@ -1,0 +1,43 @@
+{% extends 'dashboard/index.html' %}
+
+{% block dashboard_content%}
+
+<div class="card">
+    <h5 class="card-header"> Categoriess</h5>
+    <div class="card-body">
+     
+
+      <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Category List</th>
+                <th scope="col">Actions</th>
+
+                
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+
+                <tr>  
+                    <td>{{category.name}}</td>
+                    <td>
+                         <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'category_update'  category.pk %}"> Update </a></li>
+                                <li><a class="dropdown-item " href="{% url 'delete_category' category.pk  %}"> Delete </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+
+
+    </div>
+</div>
+{% endblock %}
+    

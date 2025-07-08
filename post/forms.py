@@ -1,5 +1,6 @@
 from django import forms
-from .models import Post 
+from .models import Post ,Comment, Contact
+
 
 
 #  model form helps to create a form based on the model fields
@@ -15,5 +16,23 @@ class PostForm(forms.ModelForm):
         for field_name,field in self.fields.items():
             field.widget.attrs['class']='form-control'
            
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment 
+        fields = ['content']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name,field in self.fields.items():
+            field.widget.attrs['class']='form-control'
 
 
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Contact
+        fields = ['name', 'email', 'subject', 'message']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name,field in self.fields.items():
+            field.widget.attrs['class']='form-control'

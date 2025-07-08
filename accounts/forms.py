@@ -1,6 +1,8 @@
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from  django.contrib.auth import get_user_model 
 from django.contrib.auth.forms import PasswordResetForm
+from django.views.generic import UpdateView
+from django.urls import reverse_lazy
 from django import forms 
 
 
@@ -26,6 +28,21 @@ class RegistrationForm(UserCreationForm):
 
 
 
+#  to change the status of user details 
+class UserUpdateForm(forms.ModelForm):
+    class Meta: 
+        model= User
+        fields=['username','email', 'is_staff'] 
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+            self.fields['is_staff'].widget = forms.CheckboxInput(attrs={'class': 'form-check-input'})
+            field.help_text = ''
+
+
+# password change form for changing the password of the user
 class UserPasswordChangeForm(PasswordChangeForm):
     class Meta:
         model= User
@@ -45,3 +62,26 @@ class CreatePasswordResetForm(PasswordResetForm):
         if not user.objects.filter(email=email).exists():
             raise forms.ValidationError ("Email Address is not registered")
       
+
+class UserProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+            field.help_text = ''
+
+
+class AddUserForm(UserCreationForm):
+    class Meta:
+        model=User
+        fields=['username','email','password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name,field in self.fields.items():
+            field.widget.attrs['class']='form-control'
+            field.help_text = ''

@@ -1,0 +1,132 @@
+ 
+ <div class="container-fluid d-none d-lg-block mb-4">
+        
+    {% if not  user.is_authenticated%}
+    <div class="row align-items-center bg-dark px-lg-5">
+            <div class="col-lg-9">
+                <nav class="navbar navbar-expand-sm bg-dark p-0">
+                    <ul class="navbar-nav ml-n2">
+                        <li class="nav-item border-right border-secondary">
+                            <a class="nav-link text-white small" href="#">Monday, January 1, 2045</a>
+                        </li>
+                        <li class="nav-item border-right border-secondary">
+                            <a class="nav-link text-white small" href="#">Advertise</a>
+                        </li>
+                        <li class="nav-item border-right border-secondary">
+                            <a class="nav-link text-white small" href="{% url 'contact' %}">Contact</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white small" href="{% url 'login' %}">Login</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+           
+            <div class="col-lg-3 text-right d-none d-md-block">
+                <nav class="navbar navbar-expand-sm bg-dark p-0">
+                    <ul class="navbar-nav ml-auto mr-n2">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#"><small class="fab fa-twitter"></small></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#"><small class="fab fa-facebook-f"></small></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#"><small class="fab fa-linkedin-in"></small></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#"><small class="fab fa-instagram"></small></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#"><small class="fab fa-google-plus-g"></small></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#"><small class="fab fa-youtube"></small></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+         {% endif %}
+
+         
+        <div class="row align-items-center bg-white py-3 px-lg-5">
+            <div class="col-lg-4">
+                <a href="{% url 'all-posts' %}" class="navbar-brand p-0 d-none d-lg-block">
+                    <h1 class="m-0 display-4 text-uppercase text-primary">News</span></h1>
+                </a>
+            </div>
+           
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid p-0">
+        <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-2 py-lg-0 px-lg-5">
+            <a href="{% url 'all-posts' %}" class="navbar-brand d-block d-lg-none" >
+                <h1 class="m-0 display-4 text-uppercase text-primary">News</h1>
+            </a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-between px-0 px-lg-3" id="navbarCollapse">
+                <div class="navbar-nav mr-auto py-0">
+                    <a href="{% url 'all-posts' %}" class="nav-item nav-link">Home</a>
+<div class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Categories
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+        {% for category in categories %}
+            <li>
+                <a class="dropdown-item" href="{% url 'category-posts' category.id %}">
+                    {{ category.name }}
+                </a>
+            </li>
+        {% empty %}
+            <li><span class="dropdown-item">No categories</span></li>
+        {% endfor %}
+    </ul>
+</div>
+
+    
+                 
+
+
+                     {% if request.user.is_authenticated %}
+
+                    <div class="nav-item dropdown">
+                        <a class="nav-link active dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"> 
+                            Account
+                        </a>
+                        
+
+
+
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% comment %} <li> <a class="dropdown-item" href="{% url 'update-profile' %}"> Update Profile </a></li> {% endcomment %}
+                            <li> <a class="dropdown-item" href="{% url 'changePassword' %}"> Change Password </a> </li>
+                            <li> <a class="dropdown-item" href="{% url 'update_profile' %}"> Update Profile </a> </li>
+
+                            <li> <a class="dropdown-item" aria-current="page" href="{% url 'logout' %}"> Logout   </a></li>
+                        </ul>
+                    </div>
+                    
+                    {% endif %}
+                   
+                </div>
+                <form method="get" action="{% url 'search-post' %}" class="input-group ml-auto d-none d-lg-flex" style="width: 100%; max-width: 300px;">
+    <input type="text" class="form-control border-0" name="q" placeholder="Keyword">
+    <div class="input-group-append">
+        <button type="submit" class="input-group-text bg-primary text-dark border-0 px-3">
+            <i class="fa fa-search"></i>
+        </button>
+    </div>
+</form>
+            </div>
+        </nav>
+    </div>

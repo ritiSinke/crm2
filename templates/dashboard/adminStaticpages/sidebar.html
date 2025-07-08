@@ -1,0 +1,121 @@
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+     
+    <a href="{% url 'dashboard' %}" class="brand-link">
+     <img src="../../media/images/download.jpg" alt="image" height='50' width='50'>
+    </a>
+
+   
+
+     
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+          <li class="nav-item">
+            <a href="{% url 'dashboard-details' %}" class="nav-link">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                Dashboard
+              </p>
+            </a>
+          </li>
+
+
+           <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                Posts
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'add-post'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Add Post</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href=" {% url 'admin_post' %}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>List Post </p>
+                </a>
+              </li>
+             
+
+              
+            </ul>
+          </li>
+         
+
+           <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                Category
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'category_add'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Add Category</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href=" {% url 'category_list' %}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>List Category </p>
+                </a>
+              </li>
+                     
+              
+            </ul>
+          </li> 
+
+          <li class="nav-item">
+            <a href="{% url 'dashboard-details' %}" class="nav-link">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                Comments
+              </p>
+            </a>
+          </li>
+
+          
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                User Management
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'add_user'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Add Users</p>
+                </a>
+              </li>
+
+
+              <li class="nav-item">
+                <a href="{% url 'user_list'%}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Users List </p>
+                </a>
+              </li>
+         
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
