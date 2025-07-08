@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from . import forms as fm 
 from django.contrib.auth.decorators import login_required 
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView, DeleteView
 from django.views.generic import FormView
 from django.contrib.auth.views import LogoutView, PasswordChangeView
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
@@ -77,6 +77,8 @@ class LoginView(FormView):
         auth_login(self.request, form.get_user())
         if  self.request.user.groups.filter(name='author').exists():
          return HttpResponseRedirect(self.get_success_url())
+        elif self.request.user.is_superuser:
+         return HttpResponseRedirect(reverse_lazy('dashboard'))
         else:
             return HttpResponseRedirect(reverse_lazy('all-posts'))    
     def form_invalid(self, form):
@@ -147,3 +149,53 @@ class UpdateProfileView(View):
             messages.error(request, "Error updating profile")
             return render(request, 'accounts/update_profile.html', {'form': form})
         
+
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.urls import reverse_lazy
+from django.views.generic import UpdateView
+from . import forms as fm  # Adjust if needed
+
+class UserStatusUpdate(UpdateView):
+    model = get_user_model()
+    template_name = 'dashboard/change_status.html'
+    form_class = fm.UserUpdateForm
+    success_url = reverse_lazy('user_list')
+
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'User status updated successfully')
+        return super().form_valid(form)
+    
+   
+
+class UserAddView(CreateView):
+
+    template_name='dashboard/user_addition.html'
+    form_class=fm.AddUserForm
+    model=get_user_model
+    success_url=reverse_lazy('user_list')
+
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'User added successfully')
+        return super().form_valid(form)
+
+    
+
+   
+    
+
+class UserDeleteView(DeleteView):
+
+    model=get_user_model()
+    template_name='dashboard/user_delete.html'
+    success_url=reverse_lazy('user_list')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(self.request, 'User deleted successfully')
+        return redirect(self.success_url)
+
+  

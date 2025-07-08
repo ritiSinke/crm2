@@ -6,7 +6,7 @@ from .models import Post, PostLike,Comment, Category
 from django.contrib.auth import get_user_model
 from django.views.generic import FormView, ListView
 from django.urls import reverse_lazy 
-
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from .forms import CommentForm,ContactForm
@@ -23,7 +23,8 @@ from .forms import CommentForm,ContactForm
 
 #adding posts 
 @login_required
-@permission_required("post.add_post","all-posts")
+# @user_passes_test(lambda u: u.is_staff)
+# @staff_member_required
 def add_post(request):
 
     if request.method == 'POST':
@@ -36,7 +37,7 @@ def add_post(request):
             # print(f"Files: {request.FILES}")  
             var.save()
             messages.success(request,'Post has been created')
-            return redirect( 'my-post')
+            return redirect( 'admin_posts')
  
         else:
 
@@ -50,15 +51,10 @@ def add_post(request):
 
 #updating posts 
 @login_required
-@permission_required("post.change_post","all-posts")
 def update_post(request,pk):
     post = Post.objects.get(pk=pk)
 
-    if not post.author == request.user:
-        messages.warning(request,"Permission denied")
-        return redirect('my-post')
-    
-
+  
     if request.method == 'POST':
         form = fm.PostForm(request.POST,request.FILES, instance=post)
 
@@ -66,7 +62,7 @@ def update_post(request,pk):
     
             form.save()
             messages.success(request,'Post updated')
-            return redirect ('my-post')
+            return redirect ('admin_post')
         else:
             messages.warning(request, 'Post unable to update')
             return redirect('update-post', post.pk)
@@ -80,17 +76,14 @@ def update_post(request,pk):
 
 # deleting posts
 @login_required
-@permission_required("post.delete_post","all-posts")
 def delete_post(request,pk):
     post= Post.objects.get(pk=pk)
 
-    if not post.author == request.user:
-        messages.warning(request,"Permission denied")
-        return redirect('dashboard')
+    
     
     post.delete()
     messages.success(request,"Post deleted")
-    return redirect('my-post')
+    return redirect('admin_post')
 
 
 
@@ -160,7 +153,7 @@ def my_post(request):
 
 # # like posts 
 @login_required
-@permission_required("post.add_postlike", raise_exception=True)
+
 def like_post(request, pk):
     post = Post.objects.get(pk=pk) 
     post_like_qs = PostLike.objects.filter(post=post, reader=request.user)
@@ -178,7 +171,6 @@ def like_post(request, pk):
 
 
 @login_required 
-@permission_required("post.view_postlike", "post-details")
 def post_likes(request, pk):
     post = get_object_or_404(Post, pk=pk)
     likes_qs = PostLike.objects.filter(post=post).select_related('reader')
@@ -263,3 +255,23 @@ class CategoryPostsView(ListView):
         context = super().get_context_data(**kwargs)
         context['category'] = get_object_or_404(Category, pk=self.kwargs.get('pk'))
         return context
+    
+
+
+
+
+class AdminPostView(ListView):
+
+    template_name='dashboard/list_posts.html'
+    model=Post 
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        
+        return Post.objects.filter(is_draft=False).order_by('-date_posted')
+
+    
+
+
+
+    
