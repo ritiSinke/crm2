@@ -6,6 +6,7 @@
      <img src="../../media/images/download.jpg" alt="image" height='50' width='50'>
     </a>
 
+
    
 
      
@@ -40,11 +41,18 @@
                   <p>Add Post</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href=" {% url 'admin_post' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>List Post </p>
-                </a>
+             <li class="nav-item">
+                {% if request.user.is_superuser %}
+                  <a href="{% url 'admin_post' %}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>List Post</p>
+                  </a>
+                {% else %}
+                  <a href="{% url 'my_post' %}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>List Post</p>
+                  </a>
+                {% endif %}
               </li>
              
 
@@ -53,7 +61,7 @@
           </li>
          
 
-           <li class="nav-item">
+           <li class="nav-item ">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
@@ -62,33 +70,53 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+              {% if request.user.is_superuser%}
               <li class="nav-item">
                 <a href="{% url 'category_add'%}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Add Category</p>
                 </a>
               </li>
+              {% endif %}
               <li class="nav-item">
                 <a href=" {% url 'category_list' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Category </p>
                 </a>
               </li>
-                     
-              
+                       
             </ul>
           </li> 
 
-          <li class="nav-item">
+
+.          <li class="nav-item">
             <a href="{% url 'dashboard-details' %}" class="nav-link">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
                 Comments
+                <i class="right fas fa-angle-left"></i>
+
               </p>
             </a>
-          </li>
 
-          
+            {% if request.user.is_superuser %}
+
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{% url 'admin_comment_list'%}" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p> Comments List </p>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
+              
+             
+
+         
+
+          {% if request.user.is_superuser%}
+
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -112,6 +140,7 @@
                   <p>Users List </p>
                 </a>
               </li>
+              {% endif %}
          
         </ul>
       </nav>

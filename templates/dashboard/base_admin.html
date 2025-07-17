@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="utf-8" />
+    <title>{% block title %}{% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- dist/assets-MS favicon -->
+    <link rel="shortcut icon" href="{% static 'dist/assets/images/favicon.ico' %}">
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'dist/assets/css/bootstrap.min.css' %}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <!-- Icons CSS -->
+    <link href="{% static 'dist/assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <!-- App CSS -->
+    <link href="{% static 'dist/assets/css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css" />
+    
+    {% block css %}{% endblock css %}
+
+</head>
+
+<body data-sidebar="dark">
+    
+
+    <!-- Begin page -->
+        <div id="layout-wrapper">
+
+            
+            <header id="page-topbar">
+                <div class="navbar-header">
+                    <div class="d-flex">
+                        <!-- LOGO -->
+                        <div class="navbar-brand-box text-center">
+
+                            <a href="index.html" class="logo logo-light">
+                                {% comment %} <span class="logo-sm">
+                                    <img src="{% static 'dist/assets/images/logo-sm.png' %} " alt="logo-sm-light" height="22">
+                                </span> {% endcomment %}
+                                <span class="logo-lg">
+                                    <img src="../../media/images/logo.webp" alt="logo-light" height="50">
+                                </span>
+                            </a>
+                        </div>
+
+                        <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect" id="vertical-menu-btn">
+                            <i class="ri-menu-2-line align-middle"></i>
+                        </button>
+
+                        <!-- App Search-->
+                        {% block search_content %}
+                    
+                        {% endblock search_content %}
+                    </div>
+
+                    <div class="d-flex">
+
+                        
+                        
+                        <div class="dropdown d-none d-lg-inline-block ms-1">
+                            <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
+                                <i class="ri-fullscreen-line"></i>
+                            </button>
+                        </div>
+
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
+                                  data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ri-notification-3-line"></i>
+                                <span class="noti-dot"></span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                                aria-labelledby="page-header-notifications-dropdown">
+                                <div class="p-3">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <h6 class="m-0"> Notifications </h6>
+                                        </div>
+                                        <div class="col-auto">
+                                            <a href="#!" class="small"> View All</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-simplebar style="max-height: 230px;">
+                                    <a href="#" class="text-reset notification-item">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar-xs">
+                                                    <span class="avatar-title bg-primary rounded-circle font-size-16">
+                                                        <i class="ri-shopping-cart-line"></i>
+                                                    </span>
+                                                </div>
+                                            </div>                                
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Your order is placed</h6>
+                                                <div class="font-size-12 text-muted">
+                                                    <p class="mb-1">If several languages coalesce the grammar</p>
+                                                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i> 3 min ago</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="text-reset notification-item">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <img src="{% static 'dist/assets/images/users/avatar-3.jpg' %}" class="rounded-circle avatar-xs" alt="user-pic">
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">James Lemire</h6>
+                                                <div class="font-size-12 text-muted">
+                                                    <p class="mb-1">It will seem like simplified English.</p>
+                                                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i> 1 hours ago</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="text-reset notification-item">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar-xs">
+                                                    <span class="avatar-title bg-success rounded-circle font-size-16">
+                                                        <i class="ri-checkbox-circle-line"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Your item is shipped</h6>
+                                                <div class="font-size-12 text-muted">
+                                                    <p class="mb-1">If several languages coalesce the grammar</p>
+                                                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i> 3 min ago</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <a href="#" class="text-reset notification-item">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <img src="dist/assets/images/users/avatar-4.jpg" class="rounded-circle avatar-xs" alt="user-pic">
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">Salena Layfield</h6>
+                                                <div class="font-size-12 text-muted">
+                                                    <p class="mb-1">As a skeptical Cambridge friend of mine occidental.</p>
+                                                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i> 1 hours ago</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="p-2 border-top">
+                                    <div class="d-grid">
+                                        <a class="btn btn-sm btn-link font-size-14 text-center" href="javascript:void(0)">
+                                            <i class="mdi mdi-arrow-right-circle me-1"></i> View More..
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="dropdown d-inline-block user-dropdown">
+                            <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <img class="rounded-circle header-profile-user" src="{% static 'dist/assets/images/users/avatar-2.jpg' %}"
+                                    alt="Header Avatar">
+                                <span class="d-none d-xl-inline-block ms-1">{{ user.username }}</span>
+                                <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <!-- item-->
+                                <a class="dropdown-item" href="#"><i class="ri-user-line align-middle me-1"></i> Profile</a>
+                                {% comment %} <a class="dropdown-item" href="#"><i class="ri-wallet-2-line align-middle me-1"></i> My Wallet</a>
+                                <a class="dropdown-item d-block" href="#"><span class="badge bg-success float-end mt-1">11</span><i class="ri-settings-2-line align-middle me-1"></i> Settings</a>
+                                <a class="dropdown-item" href="#"><i class="ri-lock-unlock-line align-middle me-1"></i> Lock screen</a> {% endcomment %}
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="ri-shut-down-line align-middle me-1 text-danger"></i> Logout</a>
+                            </div>
+                        </div>
+
+        
+
+                    </div>
+                </div>
+            </header>
+
+            <!-- ========== Left Sidebar Start ========== -->
+            <div class="vertical-menu">
+
+                <div data-simplebar class="h-100">
+
+                    <!--- Sidemenu -->
+                    <div id="sidebar-menu">
+                        <!-- Left Menu Start -->
+                        <ul class="metismenu list-unstyled" id="side-menu">
+                            <li class="menu-title">Menu</li>
+
+                            <li>
+                                <a href="{% url 'dashboard' %}" class="waves-effect">
+                                    <i class="mdi mdi-home-variant-outline"></i><span
+                                        class="badge rounded-pill bg-primary float-end">3</span>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+
+                            
+                            <li class="menu-title">Set up</li>
+
+                            {% comment %} <li>
+                                <a href="#" class="has-arrow waves-effect">
+                                    <i class="mdi mdi-account-cog"></i>
+                                    <span>User</span>
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+                                    <li><a href="{% url 'user_manage' %}">Manage User</a></li>
+                                    <li><a href="email-read.html">Add User</a></li>
+                                </ul>
+                            </li> {% endcomment %}
+                            {%  if request.user.is_superuser%}
+                            <li>
+                                <a href="#" class="has-arrow waves-effect">
+                                    <i class="mdi mdi-account-cog"></i>
+                                    <span>User Management</span>
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+                                    <li><a href="{% url 'add_user' %}">Create User</a></li>
+                                    <li><a href="{% url 'user_list' %}">List User</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            <li>
+                                <a href="#" class="has-arrow waves-effect">
+                                    <i class="mdi mdi-account-cog"></i>
+                                    <span>Post</span>
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+                                    <li><a href="{% url 'add-post' %}">Create Post</a></li>
+                                    {% if request.user.is_superuser %}
+
+                                    <li><a href="{% url 'admin_post' %}">List Post</a></li>
+                                    {% else %}
+
+                                    <li><a href="{% url 'my_post' %}">List Post</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+
+                             <li>
+                                <a href="#" class="has-arrow waves-effect">
+                                    <i class="mdi mdi-account-cog"></i>
+                                    <span>Category </span>
+                                </a>
+
+                                <ul class="sub-menu" aria-expanded="false">
+                                    {% if request.user.is_superuser %}
+
+                                        <li><a href="{% url 'category_add' %}">Create Category </a></li>
+                                    {% endif %}
+
+                                    <li><a href="{% url 'category_list' %}">List Category</a></li>
+                                                   
+                                    
+                                </ul>
+                            </li>
+
+                            {%  if request.user.is_superuser%}
+                            <li>
+                                <a href="#" class="has-arrow waves-effect">
+                                    <i class="mdi mdi-account-cog"></i>
+                                    <span>Comments</span>
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+                                    <li><a href="{% url 'admin_comment_list' %}">List Comments</a></li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                    <!-- Si1debar -->
+                </div>
+            </div>
+            <!-- Left Sidebar End -->
+
+            
+
+            <!-- ============================================================== -->
+            <!-- Start right Content here -->
+            <!-- ============================================================== -->
+                <div class="main-content pt-5 pb-5 ">
+                    <div class="mb-5 mt-5" >
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                            <strong>Error:</strong> {{ form.errors }}
+                            </div>
+                        {% endif %}
+                        {% block content %}
+                        
+                        {% endblock content %}
+                    </div>
+
+                
+                <!-- footer -->             
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <script>document.write(new Date().getFullYear())</script> © Dashboard.
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="text-sm-end d-none d-sm-block">
+                                    Crafted with <i class="mdi mdi-heart text-danger"></i> by Ritisha</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End footer -->
+
+            <!-- end main content-->
+            </div>
+        </div>
+        <!-- END layout-wrapper -->
+
+
+    <!-- JAVASCRIPT -->
+    <script src="{% static 'dist/assets/libs/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'dist/assets/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'dist/assets/libs/metismenu/metisMenu.min.js' %}"></script>
+    <script src="{% static 'dist/assets/libs/simplebar/simplebar.min.js' %}"></script>
+    <script src="{% static 'dist/assets/libs/node-waves/waves.min.js' %}"></script>
+    <script src="{% static 'dist/assets/js/app.js' %}"></script>
+
+
+    <!-- apexcharts js -->
+    <script src="{% static 'dist/assets/libs/apexcharts/apexcharts.min.js' %}"></script>
+
+    <!-- jquery.vectormap map -->
+    <script src="{% static 'dist/assets/libs/jqvmap/jquery.vmap.min.js' %}"></script>
+    <script src="{% static 'dist/assets/libs/jqvmap/maps/jquery.vmap.usa.js' %}"></script>
+
+    <script src="{% static 'dist/assets/js/pages/dashboard.init.js' %} "></script>
+
+    {% comment %} confirmDeleteModal {% endcomment %}
+    <script>
+        function confirmDeleteModal(event) {
+            if (!confirm('Are you sure you want to delete this ?')) {
+                event.preventDefault();
+                return false;
+            }
+    
+            // Submit the form
+            var form = event.target.closest('form');
+            form.submit();
+    
+            return true;
+        }
+      </script>
+
+    {% block javascript %}{% endblock javascript %}
+</body>
+
+</html>

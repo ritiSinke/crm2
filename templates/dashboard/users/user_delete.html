@@ -1,0 +1,16 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block dashboard_content %}
+<div class="card">
+    <h5 class="card-header">Delete User</h5>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <p>Are you sure you want to delete the user "{{ user.username }}"?</p>
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

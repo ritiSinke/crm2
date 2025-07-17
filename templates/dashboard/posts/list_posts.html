@@ -1,0 +1,105 @@
+{% extends "dashboard/base_admin.html" %}
+
+
+{% block search_content %}
+<form class="app-search d-none d-lg-block" method = "get"  action = "{% url 'search_post'%}">
+
+    <div class="row">
+      <div class="col">
+        <input class="form-control mr-sm-2" type="search" {% if search_result %} value="{{ search_result }}" {% endif %} placeholder="Search" aria-label="Search" name="search">
+    </div>
+    <div class="col p-0">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fas fa-search"></i></button>
+    </div> 
+    
+    </div>             
+</form>   
+
+{% endblock search_content %}
+
+
+
+{% block content %}
+<div class="card m-3">
+  
+
+  <div class="card-body table-responsive">
+  <table class="table table-bordered table-hover">
+    <thead class="table-secondary">
+      <tr>
+        <th scope="col">SN</th>
+        <th scope="col">Title</th>
+        <th scope="col">Status</th>
+        <th scope="col"> Image </th>
+        <th scope="col">Date Posted</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+            {% for post in posts %}
+
+                <tr>  
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{post.title}}</td>
+                    <td>
+                        {% if post.is_draft == 'True'%}
+                            <span class="badge  bg-warning"> Draft </span>
+                        {%else%}
+                            <span class="badge bg-success "> Published </span>
+        
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if post.image%}
+                             <img src={{ post.image.url }} style="max-height: 100px">
+                        {%else%}
+                             <img alt="No Image">
+                        {%endif%}
+                    </td>
+                    <td> {{ post.date_posted}}</td>
+                    <td>
+                          <div class="d-flex gap-2 align-items-center">
+                              <a href="{% url 'admin_post_details' post.pk %}" class="btn btn-secondary">View</a>
+                              <a href="{% url 'update-post' post.pk %}" class="btn btn-primary">Edit</a>
+                              <form method="post" action="{% url 'delete-post' post.pk %}" class="m-0 p-0">
+                                  {% csrf_token %}
+                                  <button type="submit" class="btn btn-danger" onclick="return confirmDeleteModal(event)">Delete</button>
+                              </form>
+                          </div>
+                      
+                    </td>
+
+                   
+                </tr>
+             {% endfor %}
+    
+    
+        </tbody>
+    
+  </table>
+  
+  </div>
+
+  {% comment %} <div class="pagination row m-auto">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div> {% endcomment %}
+</div>
+
+
+ 
+{% endblock content %}
+

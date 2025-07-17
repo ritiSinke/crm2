@@ -32,14 +32,20 @@ class RegistrationForm(UserCreationForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta: 
         model= User
-        fields=['username','email', 'is_staff'] 
+        fields=[ 'username','email', 'is_staff'] 
     
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('current_user', None)
+
         super().__init__(*args, **kwargs)
+
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
             self.fields['is_staff'].widget = forms.CheckboxInput(attrs={'class': 'form-check-input'})
+
             field.help_text = ''
+        
+        
 
 
 # password change form for changing the password of the user

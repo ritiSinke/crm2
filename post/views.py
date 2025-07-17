@@ -4,12 +4,21 @@ from django.contrib.auth.decorators import login_required,permission_required
 from . import forms as fm 
 from .models import Post, PostLike,Comment, Category
 from django.contrib.auth import get_user_model
-from django.views.generic import FormView, ListView
+from django.views.generic import FormView, ListView, DetailView 
+from django.views.generic.edit import FormMixin
+
 from django.urls import reverse_lazy 
+from django.utils.decorators import method_decorator
+
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from .forms import CommentForm,ContactForm
+from django.core.exceptions import PermissionDenied
+
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+from django.http import HttpResponseForbidden
+
 # Create your views here.
 
 
@@ -21,10 +30,27 @@ from .forms import CommentForm,ContactForm
 #     def form_invalid(self, form):
 #         return self.render_to_response(self.get_context_data(form=form))
 
+
+
+
+# super user lai matra access diney partt 
+class SuperUserRequiredMixin( LoginRequiredMixin ,UserPassesTestMixin):
+   
+   def test_func(self):
+        return self.request.user.is_superuser
+    
+
+   def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+         return HttpResponseForbidden('You are not authorised to acces this page')
+        return super().handle_no_permission()
+    
+
+
 #adding posts 
 @login_required
 # @user_passes_test(lambda u: u.is_staff)
-# @staff_member_required
+@staff_member_required
 def add_post(request):
 
     if request.method == 'POST':
@@ -46,15 +72,19 @@ def add_post(request):
     else:
         form = fm.PostForm()
         context ={ 'form':form, 'is_author': request.user.groups.filter(name='author').exists()}
-    return render(request,'post/add_post.html', context)
+    return render(request,'dashboard/posts/add_post.html', context)
     
 
 #updating posts 
 @login_required
+@staff_member_required
+
 def update_post(request,pk):
     post = Post.objects.get(pk=pk)
-
-  
+     
+    if  not (request.user == post.author or request.user.is_superuser):
+        raise PermissionDenied
+    
     if request.method == 'POST':
         form = fm.PostForm(request.POST,request.FILES, instance=post)
 
@@ -62,28 +92,40 @@ def update_post(request,pk):
     
             form.save()
             messages.success(request,'Post updated')
-            return redirect ('admin_post')
+            if request.user.is_superuser:
+             return redirect ('admin_post')
+            else:
+                return redirect('my_post')
+            
         else:
             messages.warning(request, 'Post unable to update')
             return redirect('update-post', post.pk)
         
     else:
         form =fm.PostForm(instance=post)
-        context ={ 'form' : form, 'post': post, 'is_author': request.user.groups.filter(name='author').exists()}
-    return render(request,'post/add_post.html',context)
+
+    context ={ 'form' : form, 'post': post}
+    return render(request,'dashboard/posts/add_post.html',context)
+    
+
+
     
 
 
 # deleting posts
 @login_required
+@staff_member_required
+
 def delete_post(request,pk):
     post= Post.objects.get(pk=pk)
-
     
+    if  not (request.user == post.author or request.user.is_superuser):
+        raise PermissionDenied
     
-    post.delete()
-    messages.success(request,"Post deleted")
-    return redirect('admin_post')
+    else: 
+        post.delete()
+        messages.success(request,"Post deleted")
+        return redirect('admin_post')
 
 
 
@@ -91,9 +133,8 @@ def delete_post(request,pk):
 def post_details(request,pk):
     post = Post.objects.get(pk=pk)
     likecount= PostLike.objects.filter(post=post).count()
-    comments = post.comments.filter(parents__isnull=True).order_by('-date_posted')
+    comments = post.comments.filter(parents__isnull=True, is_delete=False).order_by('-date_posted')
     form=CommentForm()
-
 
    
     if request.method == 'POST':
@@ -106,6 +147,7 @@ def post_details(request,pk):
                 comment.post = post
 
                 parent_id = request.POST.get('parent_id')
+
                 if parent_id:
                      comment.parents_id= int (parent_id)
 
@@ -144,10 +186,14 @@ def author_posts(request,pk):
 
 
 @login_required
+@staff_member_required
+
 def my_post(request):
-    post= Post.objects.filter(author=request.user)
-    context ={ 'post': post, 'is_author': request.user.groups.filter(name='author').exists()}
-    return render(request, 'post/my_post.html', context)
+    post = Post.objects.filter(author=request.user, author__is_staff=True)
+    context = {
+        'posts': post,
+    }
+    return render(request, 'dashboard/posts/my_post.html', context)
 
 
 
@@ -161,12 +207,18 @@ def like_post(request, pk):
     if post_like_qs.exists():
         # Since user already liked, just show warning and redirect
         messages.warning(request, "Already liked")
-        return redirect('post-details', post.pk)
+        if request.user.is_superuser and request.user.is_staff:
+            return redirect('admin_post_details', post.pk )
+        else:
+            return redirect('post-details', post.pk)
     else:
         # Create new like entry
         PostLike.objects.create(reader=request.user, post=post, like_count=1)
         messages.success(request, "Post liked")
-        return redirect('post-details', post.pk)
+        if request.user.is_superuser and request.user.is_staff:
+             return redirect('admin_post_details', post.pk )
+        else:
+            return redirect('post-details', post.pk)
 
 
 
@@ -222,6 +274,8 @@ def search_posts(request):
     return render(request, 'post/search_posts.html', context)  
 
 
+
+
 # contact page viewing 
 class ContactView(FormView):
     template_name = 'post/staticPages/contact.html'
@@ -240,6 +294,8 @@ class ContactView(FormView):
    
 
 #  to get category posts
+
+
 class CategoryPostsView(ListView):
     model = Post
     template_name = 'post/category_posts.html'  # your template
@@ -260,18 +316,99 @@ class CategoryPostsView(ListView):
 
 
 
-class AdminPostView(ListView):
 
-    template_name='dashboard/list_posts.html'
+class AdminPostView(SuperUserRequiredMixin, ListView):
+    
+    template_name='dashboard/posts/list_posts.html'
     model=Post 
     context_object_name = 'posts'
+    queryset=Post.objects.all().order_by('-date_posted')
+
+   
+
+
+
+class CommentListView(SuperUserRequiredMixin, ListView):
+    template_name='dashboard/admin_comments_list.html'
+    model=Comment
+    context_object_name='comments'
 
     def get_queryset(self):
+        return Comment.objects.filter(is_delete=False).select_related('post','author').order_by('-date_posted')
+    
+
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminPostDetailsView(LoginRequiredMixin,FormMixin, DetailView):
+    template_name = 'dashboard/posts/admin_post_details.html'
+    model = Post
+    context_object_name = 'post'
+    form_class = CommentForm  # needed by FormMixin
+
+    def get_success_url(self):
+        return self.request.path  # reload same page after POST
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        context['like_count'] = PostLike.objects.filter(post=post).count()
+        context['comments'] = post.comments.filter(parents__isnull=True, is_delete=False).order_by('-date_posted')
+        context['form'] = kwargs.get('form') or self.get_form()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()  # required for DetailView
+        if not request.user.is_authenticated:
+            messages.warning(request, "You must be logged in to comment")
+            return redirect('login')
+
+        form = self.get_form()
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.author = request.user
+            comment.post = self.object
+
+            parent_id = request.POST.get('parent_id')
+            if parent_id:
+                comment.parents_id = int(parent_id)
+
+            comment.save()
+            return redirect(self.get_success_url())
+
+        # If form is invalid, re-render page with errors
+        return self.render_to_response(self.get_context_data(form=form))    
+
+
+
+
+
+
+class SearchPostView(ListView):
+
+    model=Post
+    template_name= 'dashboard/posts/search_posts.html'
+    context_object_name= 'posts'
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        search_query = self.request.GET.get('search', '').strip()
+        content_type = self.request.GET.get('content_type', '').strip()
+
+        if search_query:
+            queryset = queryset.filter(title__icontains=search_query)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_result'] = self.request.GET.get('search', '').strip()
         
-        return Post.objects.filter(is_draft=False).order_by('-date_posted')
-
+        return context
     
 
 
 
-    
+
+   
+

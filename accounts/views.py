@@ -75,10 +75,12 @@ class LoginView(FormView):
 
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
-        if  self.request.user.groups.filter(name='author').exists():
-         return HttpResponseRedirect(self.get_success_url())
-        elif self.request.user.is_superuser:
-         return HttpResponseRedirect(reverse_lazy('dashboard'))
+       
+        if  self.request.user.is_superuser or self.request.user.is_staff:
+            messages.success(self.request, "Login Successfully!")
+            # print("User is staff or superuser, redirecting to dashboard")
+            # Redirect to the dashboard for staff or superusers
+            return HttpResponseRedirect(reverse_lazy('dashboard'))
         else:
             return HttpResponseRedirect(reverse_lazy('all-posts'))    
     def form_invalid(self, form):
@@ -158,7 +160,7 @@ from . import forms as fm  # Adjust if needed
 
 class UserStatusUpdate(UpdateView):
     model = get_user_model()
-    template_name = 'dashboard/change_status.html'
+    template_name = 'dashboard/users/change_status.html'
     form_class = fm.UserUpdateForm
     success_url = reverse_lazy('user_list')
 
@@ -171,7 +173,7 @@ class UserStatusUpdate(UpdateView):
 
 class UserAddView(CreateView):
 
-    template_name='dashboard/user_addition.html'
+    template_name='dashboard/users/user_addition.html'
     form_class=fm.AddUserForm
     model=get_user_model
     success_url=reverse_lazy('user_list')
