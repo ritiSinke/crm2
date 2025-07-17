@@ -63,7 +63,9 @@ def add_post(request):
             # print(f"Files: {request.FILES}")  
             var.save()
             messages.success(request,'Post has been created')
-            return redirect( 'admin_posts')
+            if request.user.is_superuser:
+             return redirect( 'admin_post')
+            return redirect('my_post')
  
         else:
 
@@ -83,7 +85,7 @@ def update_post(request,pk):
     post = Post.objects.get(pk=pk)
      
     if  not (request.user == post.author or request.user.is_superuser):
-        raise PermissionDenied
+        return HttpResponseForbidden('You are not authorised')
     
     if request.method == 'POST':
         form = fm.PostForm(request.POST,request.FILES, instance=post)
@@ -98,6 +100,7 @@ def update_post(request,pk):
                 return redirect('my_post')
             
         else:
+
             messages.warning(request, 'Post unable to update')
             return redirect('update-post', post.pk)
         
@@ -168,8 +171,7 @@ def post_details(request,pk):
         'form': form,
     }
     return render(request, 'post/post_details.html', context)       
-    # context ={ 'post': post, 'like_count': likecount} 
-    # return render (request, 'post/post_details.html',context)
+  
 
 
 
@@ -184,16 +186,33 @@ def author_posts(request,pk):
 
 
 
+from django.core.paginator import Paginator
 
-@login_required
-@staff_member_required
 
-def my_post(request):
-    post = Post.objects.filter(author=request.user, author__is_staff=True)
-    context = {
-        'posts': post,
-    }
-    return render(request, 'dashboard/posts/my_post.html', context)
+
+# def my_post(request):
+#     post = Post.objects.filter(author=request.user, author__is_staff=True).order_by('-date_posted')
+#     paginator = Paginator(post, 10)  # Show 10 contacts per page.
+#     page_number = request.GET.get("page")
+#     page_obj = paginator.get_page(page_number)
+
+#     context = {
+#         'posts': post,
+#         'page_obj': page_obj
+#     }
+#     return render(request, 'dashboard/posts/my_post.html', context)
+
+class AuthorPostView(ListView):
+
+    model= Post
+    template_name="dashboard/posts/my_post.html"
+    paginate_by=10
+    context_object_name='posts'
+
+    def get_queryset(self):
+        return Post.objects.filter(author = self.request.user ).order_by('-date_posted')
+    
+
 
 
 
@@ -300,7 +319,6 @@ class CategoryPostsView(ListView):
     model = Post
     template_name = 'post/category_posts.html'  # your template
     context_object_name = 'posts'
-    paginate_by = 10  # optional, if you want pagination
 
     def get_queryset(self):
         category_pk = self.kwargs.get('pk')
@@ -320,6 +338,8 @@ class CategoryPostsView(ListView):
 class AdminPostView(SuperUserRequiredMixin, ListView):
     
     template_name='dashboard/posts/list_posts.html'
+    paginate_by=10  # aauta page ma kati ota post dekhauney 
+
     model=Post 
     context_object_name = 'posts'
     queryset=Post.objects.all().order_by('-date_posted')
@@ -332,19 +352,32 @@ class CommentListView(SuperUserRequiredMixin, ListView):
     template_name='dashboard/admin_comments_list.html'
     model=Comment
     context_object_name='comments'
+    paginate_by=10
 
     def get_queryset(self):
-        return Comment.objects.filter(is_delete=False).select_related('post','author').order_by('-date_posted')
+        return Comment.objects.all().select_related('post','author').order_by('-date_posted')
     
 
 
 
-@method_decorator(staff_member_required, name='dispatch')
-class AdminPostDetailsView(LoginRequiredMixin,FormMixin, DetailView):
+# @method_decorator(staff_member_required, name='dispatch')
+
+class AdminPostDetailsView(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailView):
     template_name = 'dashboard/posts/admin_post_details.html'
     model = Post
     context_object_name = 'post'
     form_class = CommentForm  # needed by FormMixin
+
+    
+
+    def test_func(self):
+     return self.request.user.is_superuser or self.request.user.is_staff
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+         return HttpResponseForbidden('You are not authorised to acces this page')
+        return super().handle_no_permission()
+    
 
     def get_success_url(self):
         return self.request.path  # reload same page after POST

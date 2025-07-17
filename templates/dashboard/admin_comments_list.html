@@ -35,69 +35,73 @@
   
 
   <div class="card-body table-responsive">
-    <table class="table table-bordered table-hover">
-        <thead class="table-secondary">
-            <tr>
-                <th scope="col">S.N. </th> 
-                <th scope="col"> Commented By </th>
-                <th scope="col">Comments </th>    
-                <th scope="col"> Post</th>
-                <th scope="col"> Author </th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-    <tbody>
-             {% for comment in comments %}
+        <table class="table table-bordered table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">S.N. </th> 
+                        <th scope="col"> Commented By </th>
+                        <th scope="col">Comments </th>    
+                        <th scope="col"> Post</th>
+                        <th scope="col"> Author </th>
+                        <th scope="col">Is delete </th> 
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+            <tbody>
+                    {% for comment in comments %}
 
-                <tr>  
-                    <td> {{forloop.counter}}</td>
-                    <td> {{comment.author.username}}</td>
-                    <td> {{comment.content}} </td>
-                    <td> {{ comment.post.title}}</td>
-                    <td> {{comment.post.author}}</td>
-                    {% if request.user.is_superuser%}
-                        <td style="border-right: 1px solid #dee2e6;">
-                            <form method="post" action="{% url 'delete_comment' comment.pk %}" class="m-0 p-0 d-inline-block w-100">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm w-100" onclick="return confirmDeleteModal(event)">Delete</button>
-                            </form>
-                    </td>
+                        <tr>  
+                            <td> {{forloop.counter}}</td>
+                            <td> {{comment.author.username}}</td>
+                            <td> {{comment.content}} </td>
+                            <td> {{ comment.post.title}}</td>
+                            <td> {{comment.post.author}}</td>
+                            <td> {{ comment.is_delete}} </td>
+                            {% if request.user.is_superuser%}
+                                <td style="border-right: 1px solid #dee2e6;">
+                                    <form method="post" action="{% url 'delete_comment' comment.pk %}" class="m-0 p-0 d-inline-block w-100">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm w-100" onclick="return confirmDeleteModal(event)">Delete</button>
+                                    </form>
+                            </td>
 
-                    {% else %}
-                    <td> </td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
+                            {% else %}
+                            <td> </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
 
-                                  
-              
-    
-        </tbody>
-    
-  </table>
+                                        
+                    
+            
+                </tbody>
+            
+        </table>
   
-  </div>
-  {% comment %} <div class="pagination row m-auto">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-        {% endif %}
+    </div>
+   <div class="pagination row m-auto">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
 
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
         </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-    </span>
-</div> {% endcomment %}
+    </div>
 </div>
 
 
-</div>
+
+
+
  
 {% endblock content %}
 
