@@ -43,7 +43,13 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     date_posted = models.DateTimeField(auto_now_add=True)
+
+    is_delete=models.BooleanField(default=False)
+
     parents=models.ForeignKey('self', on_delete=models.CASCADE, related_name='replies',blank=True, null=True)
+
+
+
 
 
 class Contact(models.Model):

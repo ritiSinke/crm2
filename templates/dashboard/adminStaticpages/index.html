@@ -1,0 +1,20 @@
+{% extends "base_admin.html" %}
+
+{% block content %} 
+{% if user.is_authenticated %}
+    welcome: {{ user.username }} <br>
+    <h3> 
+        <a href="{%url 'create-content' %}">create content</a>
+    </h3>
+    <h3>
+        <a href="{%url 'list-content' %}">List content </a>
+    </h3>
+    <a href="{% url 'logout' %}">logout</a>
+
+    {% else %}
+    please login first
+    <a href="{% url 'login' %}">Login</a>
+    
+{% endif %}
+
+{% endblock content %}

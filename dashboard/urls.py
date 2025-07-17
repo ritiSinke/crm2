@@ -10,4 +10,6 @@ urlpatterns =[
     path('category-add/', views.CategoryAddView.as_view(), name='category_add'),
     path('category-update/<int:pk>/', views.CategoryUpdateView.as_view(), name='category_update'),
     path('category-delete/<int:pk>/', CategoryDeleteView.as_view(), name='delete_category'),
+    path('author-list/',views.AuthorListView.as_view(), name='author_list'),
+    
 ]

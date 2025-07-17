@@ -1,5 +1,5 @@
 from django import forms
-from post.models import Category 
+from post.models import Category, Comment 
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -11,3 +11,5 @@ class CategoryForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field_name,field in self.fields.items():
             field.widget.attrs['class']='form-control'
+
+

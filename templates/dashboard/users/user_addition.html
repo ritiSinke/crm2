@@ -1,0 +1,17 @@
+{% extends 'dashboard/base_admin.html' %}
+{% block content %}
+<div class="card m-3">
+        <div class="card-body">
+
+    <form method="post" enctype="multipart/form-data">
+        
+        {% csrf_token %}
+        {{ form.as_p }}
+        {{ form.media }}
+        <hr>
+    <button type="submit" class="btn btn-success">Create User </button>
+    </form>
+</div>
+</div>
+    
+{% endblock content %}

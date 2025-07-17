@@ -61,6 +61,7 @@
                     <h5>Comments</h5>
                     {% for comment in comments %}
                         <div class="mb-2">
+                            
                             <strong>{{ comment.author.username }}</strong> ({{ comment.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
                             {{ comment.content }}
 
