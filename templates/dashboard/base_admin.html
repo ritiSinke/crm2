@@ -275,16 +275,29 @@
                             </li>
 
                             {%  if request.user.is_superuser%}
+                                <li>
+                                    <a href="#" class="has-arrow waves-effect">
+                                        <i class="mdi mdi-account-cog"></i>
+                                        <span>Comments</span>
+                                    </a>
+                                    <ul class="sub-menu" aria-expanded="false">
+                                        <li><a href="{% url 'admin_comment_list' %}">List Comments</a></li>
+                                    </ul>
+                                </li>
+                            {% endif %}
+
+                            {%  if request.user.is_superuser%}
                             <li>
-                                <a href="#" class="has-arrow waves-effect">
-                                    <i class="mdi mdi-account-cog"></i>
-                                    <span>Comments</span>
+                                <a href=" {% url 'contact_info' %}" >
+                                    <i class="mdi mdi-account-cog"></i> 
+                                    <span>Contact Request  </span>
+                                    
                                 </a>
-                                <ul class="sub-menu" aria-expanded="false">
-                                    <li><a href="{% url 'admin_comment_list' %}">List Comments</a></li>
-                                </ul>
+                                
                             </li>
                             {% endif %}
+
+                            
 
                         </ul>
                     </div>

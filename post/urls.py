@@ -13,7 +13,7 @@ urlpatterns=[
     path('delete-post/<int:pk>/', views.delete_post, name='delete-post'),
     path('like-post/<int:pk>/', views.like_post, name='like-post'),
     path('author-post/<int:pk>/', views.author_posts, name='author-post'),
-    path('search-post/',views.search_posts, name='search_posts'),
+    path('search-post/',views.search_posts, name='search_posts'  ),
     path('post/<int:pk>/likes-json/', views.post_likes, name='post-likes'),
     path('my-post/', views.AuthorPostView.as_view(), name='my_post'),
 

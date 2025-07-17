@@ -1,0 +1,39 @@
+{% extends 'dashboard/base_admin.html'%}
+
+
+
+{% block content %}
+
+
+<div class="container-fluid">
+    <div class="container">
+        <div class=" ">
+            <div class="col-lg-8">
+                
+                <div class="position-relative mb-3">
+                
+                    
+                    <div class="bg-white border border-top-0 p-4">
+                        <div class="mb-3">
+                           <h1> {{contacts.name}} </h1>
+                            <a class="text-body" href="">{{ contacts.email }}</a>
+                        </div>
+                        <h1 class="mb-3 text-secondary font-weight-bold">Subject: {{ contacts.subject }}</h1>
+                        
+                        <p>{{ contacts.message|linebreaks }}</p>
+                    </div>
+                    
+                    
+                </div>
+                <!-- News Detail End -->
+
+               
+               
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

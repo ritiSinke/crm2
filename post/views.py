@@ -349,7 +349,7 @@ class AdminPostView(SuperUserRequiredMixin, ListView):
 
 
 class CommentListView(SuperUserRequiredMixin, ListView):
-    template_name='dashboard/admin_comments_list.html'
+    template_name='dashboard/comments/admin_comments_list.html'
     model=Comment
     context_object_name='comments'
     paginate_by=10

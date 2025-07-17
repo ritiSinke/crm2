@@ -1,0 +1,63 @@
+{% extends 'dashboard/base_admin.html'%}
+
+{% block content %}
+
+    <div class="card m-3">
+  
+
+  <div class="card-body table-responsive">
+  <table class="table table-bordered table-hover">
+    <thead class="table-secondary">
+      <tr>
+        <th scope="col">SN</th>
+        <th scope="col">Name</th>
+        <th scope="col"> Email </th>
+        <th scope="col"> Date Sent </th>
+        <th scope="col"> Subject </th>
+        <th scope="col"> Message </th>
+        <th scope="col"> Action </th>
+        
+
+    </thead>
+    <tbody>
+            {% for contact in contacts %}
+
+                <tr>  
+                    <td> {{forloop.counter}}</td>
+                    <td>{{contact.name}}</td>
+                    <td> {{ contact.email}} </td>
+                    <td> {{ contact.date_sent}} </td>
+                    <td> {{contact.subject}}</td>
+                    <td> {{ contact.message| truncatechars:"15"}} </td>
+                    <td style="border-right: 1px solid #dee2e6;">
+                              <a href="{% url 'contact_details' contact.pk%}" class="btn btn-primary">View</a>
+                    </td>                          
+                </tr>
+                {% endfor %}
+    
+    
+        </tbody>
+    
+  </table>
+  
+  </div>
+  <div class="pagination row m-auto">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+ 
+{% endblock content %}

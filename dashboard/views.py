@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.contrib import messages 
 from django.contrib.auth.decorators import login_required
 from post.models import Post 
-from django.views.generic import TemplateView,FormView,DeleteView , ListView
+from django.views.generic import TemplateView,FormView,DeleteView , ListView, DetailView
 from post.models import Post, Category, User, Comment 
 from .forms import CategoryForm
 from django.urls import reverse_lazy
@@ -50,13 +50,12 @@ class DashboardDetailsView(LoginRequiredMixin, TemplateView):
 
 
 
-class UserListView(SuperUserRequiredMixin, TemplateView):
+class UserListView(SuperUserRequiredMixin, ListView):
     template_name = 'dashboard/users/user_list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['users'] = User.objects.all()
-        return context
+    paginate_by=10
+    model=User
+    context_object_name='users'
+    queryset=User.objects.all()
     
 
 
@@ -127,6 +126,7 @@ class AuthorListView(SuperUserRequiredMixin, ListView):
     template_name = 'dashboard/users/author_list.html'
     queryset=User.objects.filter(is_staff=True)
     context_object_name= 'authors'
+    paginate_by=10
 
     
     
@@ -162,6 +162,32 @@ def softDeleteComment(request,pk):
         return redirect('admin_comment_list')
     
     
-    return render(request,'dashboard/delete_comments.html', context)
+    return render(request,'dashboard/comments/delete_comments.html', context)
+
+
+from post.models import Contact 
+
+class ContactInfoView(SuperUserRequiredMixin, ListView):
+
+    model=Contact 
+    template_name='dashboard/contact/contact_info.html'
+    paginate_by=10
+
+    context_object_name= 'contacts'
+    queryset= Contact.objects.all().order_by('date_sent')
+
+
+class ContactDetailsView(SuperUserRequiredMixin,DetailView):
+    
+    model=Contact
+    template_name= 'dashboard/contact/contact_details.html'
+    context_object_name= 'contacts'
+
+    
+    def get_object(self):
+        pk=self.kwargs.get('pk')
+        return Contact.objects.get(pk=pk)
+
+
 
 
