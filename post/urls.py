@@ -6,6 +6,7 @@ from django.conf import settings
 
 urlpatterns=[
 
+
     path('', views.all_posts, name='all-posts'),
     path ('add-post/', views.add_post, name= 'add-post'),
     path('update-post/<int:pk>/', views.update_post, name='update-post'),
@@ -23,9 +24,13 @@ urlpatterns=[
     path('admin-posts/',views.AdminPostView.as_view(),name='admin_post'),
     path('admin-comments-list/',views.CommentListView.as_view(), name='admin_comment_list'),
     # path('delete-comments/<int:pk>/', CommentUpdateView.as_view(),name='delete_comment'),
+    
+
+    #  admin ko features 
     path('delete_comments/<int:pk>/', softDeleteComment,name='delete_comment'),
     path('post-post-details/<int:pk>/',views.AdminPostDetailsView.as_view() , name='admin_post_details'),
     path('search/',views.SearchPostView.as_view(), name='search'),
+    path ('mark-as-read/',views.MarkAllNorificationRead.as_view(), name='mark_all_read'),
 
 
 ] + static( settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

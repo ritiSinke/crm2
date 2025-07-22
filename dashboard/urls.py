@@ -3,6 +3,9 @@ from . import views
 from .views import CategoryDeleteView
 
 urlpatterns =[
+
+    #  admin ko features 
+    
     path('', views.dashboard, name='dashboard'), 
     path('dashboard-details/', views.DashboardDetailsView.as_view(), name='dashboard-details'),
     path('category-list/', views.CategoryListView.as_view(), name='category_list'),

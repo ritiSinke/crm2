@@ -47,68 +47,106 @@ class SuperUserRequiredMixin( LoginRequiredMixin ,UserPassesTestMixin):
     
 
 
+from .models import Notification
+from django.contrib.auth import get_user_model
+
 #adding posts 
 @login_required
 # @user_passes_test(lambda u: u.is_staff)
 @staff_member_required
+
+
 def add_post(request):
-
     if request.method == 'POST':
-        form = fm.PostForm(request.POST,request.FILES)
-        # print(f"Files: {request.FILES}")  
+        form = fm.PostForm(request.POST, request.FILES)
         if form.is_valid():
-            var= form.save(commit= False)
-            var.author= request.user
-
-            # print(f"Files: {request.FILES}")  
+            var = form.save(commit=False)
+            var.author = request.user
             var.save()
-            messages.success(request,'Post has been created')
-            if request.user.is_superuser:
-             return redirect( 'admin_post')
-            return redirect('my_post')
- 
-        else:
+            messages.success(request, 'Post has been created')
 
-            messages.warning (request,'Post was not able to be created')
-            return redirect ('add-post')
+            # --- Notification logic starts here ---
+            # Get all staff users except the one who created the post
+
+            # User = get_user_model()
+
+            # other_staff_users = User.objects.filter(is_superuser=True)
+
+            # # Create notifications for each staff user
+            # for user in other_staff_users:
+            #     Notification.objects.create(
+            #         user=user,
+            #         message=f"New post titled '{var.title}' created by '{request.user.username}'"
+            #     )
+
+            # --- Notification logic ends here ---
+
+            if request.user.is_superuser:
+                return redirect('admin_post')
+            return redirect('my_post')
+
+        else:
+            messages.warning(request, 'Post was not able to be created')
+            return redirect('add-post')
     else:
         form = fm.PostForm()
-        context ={ 'form':form, 'is_author': request.user.groups.filter(name='author').exists()}
-    return render(request,'dashboard/posts/add_post.html', context)
-    
+        context = {'form': form, 'is_author': request.user.groups.filter(name='author').exists()}
+    return render(request, 'dashboard/posts/add_post.html', context)
+
 
 #updating posts 
 @login_required
 @staff_member_required
 
-def update_post(request,pk):
-    post = Post.objects.get(pk=pk)
-     
-    if  not (request.user == post.author or request.user.is_superuser):
-        return HttpResponseForbidden('You are not authorised')
-    
-    if request.method == 'POST':
-        form = fm.PostForm(request.POST,request.FILES, instance=post)
+def update_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    User = get_user_model()
 
-        if form.is_valid():
     
+    if not (request.user == post.author or request.user.is_superuser):
+        return HttpResponseForbidden('You are not authorised')
+
+    if request.method == 'POST':
+        form = fm.PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
             form.save()
-            messages.success(request,'Post updated')
+            
+            # Send notifications to other staff users
+            superusers=User.objects.filter(is_superuser=True)
+            editor=request.user
+
+            for admin in superusers:
+                Notification.objects.create(
+                    user=admin,
+                    message=f" Post '{post.title}' has been updated by {editor.username}"
+                )
+
+            if post.author not in superusers:
+                Notification.objects.create(
+                    user=post.author,
+
+                    #  yo use garna mildaina kna bhaney yesle post ko author lai access gana sakidaina so use this in update_post ma 
+                    message=f" Post '{post.title}' has been updated by {editor.username}"
+
+#             )
+
+            )
+                
+            messages.success(request, 'Post updated successfully ')
+            
             if request.user.is_superuser:
-             return redirect ('admin_post')
+                return redirect('admin_post')
             else:
                 return redirect('my_post')
-            
         else:
-
-            messages.warning(request, 'Post unable to update')
-            return redirect('update-post', post.pk)
-        
+            messages.warning(request, 'Unable to update post. Please check the form.')
+            return redirect('update-post', pk=post.pk)
+    
     else:
-        form =fm.PostForm(instance=post)
+        form = fm.PostForm(instance=post)
 
-    context ={ 'form' : form, 'post': post}
-    return render(request,'dashboard/posts/add_post.html',context)
+    context = {'form': form, 'post': post}
+    return render(request, 'dashboard/posts/add_post.html', context)
     
 
 
@@ -127,6 +165,7 @@ def delete_post(request,pk):
     
     else: 
         post.delete()
+
         messages.success(request,"Post deleted")
         return redirect('admin_post')
 
@@ -156,6 +195,7 @@ def post_details(request,pk):
 
                 comment.save()
                 print(form.errors)
+                
                 return redirect('post-details', pk=post.pk)
             else:
            
@@ -216,6 +256,7 @@ class AuthorPostView(ListView):
 
 
 
+from accounts.models import User 
 # # like posts 
 @login_required
 
@@ -226,7 +267,7 @@ def like_post(request, pk):
     if post_like_qs.exists():
         # Since user already liked, just show warning and redirect
         messages.warning(request, "Already liked")
-        if request.user.is_superuser and request.user.is_staff:
+        if request.user.is_superuser or request.user.is_staff:
             return redirect('admin_post_details', post.pk )
         else:
             return redirect('post-details', post.pk)
@@ -234,8 +275,25 @@ def like_post(request, pk):
         # Create new like entry
         PostLike.objects.create(reader=request.user, post=post, like_count=1)
         messages.success(request, "Post liked")
-        if request.user.is_superuser and request.user.is_staff:
+
+
+        superusers=User.objects.filter(is_superuser=True)
+
+        for admin in superusers:
+            Notification.objects.create(
+                user=admin,
+                message=f"{request.user.username} liked the post: '{post.title}'"
+            )
+
+        if post.author not in superusers:
+            Notification.objects.create(
+                    user=post.author,
+                    message=f"{request.user.username} liked your post: '{post.title}'"
+                )
+
+        if request.user.is_superuser or request.user.is_staff:
              return redirect('admin_post_details', post.pk )
+        
         else:
             return redirect('post-details', post.pk)
 
@@ -443,5 +501,9 @@ class SearchPostView(ListView):
 
 
 
-   
+from django.views import View
+class MarkAllNorificationRead(LoginRequiredMixin,View):
+    def post(self, request, *args, **kwargs):
+        request.user.notifications.filter(is_read=False).update(is_read=True)
+        return JsonResponse({'status': 'success'})
 
