@@ -22,12 +22,17 @@ def dashboard(request):
         admin = True
     else:
         return redirect('all-posts')
+    
+
+    notifications = request.user.notifications.order_by('-created_at')[:10]
+
     return render(request, 'dashboard/index_dashboard.html',{
         'admin': admin,
         'posts' : Post.objects.count(),
         'categories' : Category.objects.count(),
         'users' :User.objects.count(), 
         'authors' :User.objects.filter(is_staff=True).count(),
+        'notifications': notifications,   
 
     })
 
@@ -71,6 +76,7 @@ class CategoryListView(LoginRequiredMixin, TemplateView):
 
   
     
+from post.models import Notification
 class CategoryAddView( SuperUserRequiredMixin, FormView):
     template_name = 'dashboard/category/add_category.html'
     form_class = CategoryForm
@@ -78,6 +84,8 @@ class CategoryAddView( SuperUserRequiredMixin, FormView):
 
     def form_valid(self, form):
         form.save()
+
+
         messages.success(self.request, 'Category added successfully')
         return super().form_valid(form)
 
@@ -115,6 +123,7 @@ class CategoryDeleteView(SuperUserRequiredMixin, DeleteView):
     model = Category
     template_name = 'dashboard/category_confirm_delete.html'  
 
+   
     success_url=reverse_lazy('category_list')
 
     # messages.success(self.request,'User deleted successfully')

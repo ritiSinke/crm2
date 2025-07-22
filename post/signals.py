@@ -1,0 +1,156 @@
+from .models import Post, Notification, Category, Comment
+from django.db.models.signals import post_save,post_delete
+from django.dispatch import receiver
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+
+
+User= get_user_model()
+
+#  to notify after postaddition
+@receiver (post_save, sender= Post)
+def notifySuperuserAfterPostAdd(sender, instance, created , **kwargs):
+     if created: 
+        users= User.objects.filter(is_superuser=True)
+
+        for admin in users:
+            Notification.objects.create(
+            user=admin,
+            message=f"New post '{instance.title}' was created by {instance.author}"
+            )
+
+
+#  to notify after postdeletion
+
+@receiver(post_delete, sender=Post)
+def notifySuperuserAfterPostDelete(sender, instance, **kwargs):
+
+    superusers= User.objects.filter(is_superuser=True)
+
+    for admin in superusers:
+     Notification.objects.create(
+        user=admin,
+        message=f" Post '{instance.title}' is deleted by {instance.author}"
+     )
+
+
+    if instance.author not in superusers:
+         Notification.objects.create(
+            user=instance.author,
+            message=f"Your post '{instance.title}' has been deleted"
+        )
+         
+
+# yesma mildaina cuz yesle poet koa uthor ko access didiaina aahile change gareko user matra dekhauxa 
+# @receiver(post_save, sender=Post)
+# def notifyAfterPostUpdate(sender, instance, created, **kwargs):
+#     if not created:
+        
+#         superusers=User.objects.filter(is_superuser=True)
+
+#         for admin in superusers:
+#             Notification.objects.create(
+#                 user=admin,
+#                 message=f" Post '{instance.title}' has been updated by {instance.author}"
+#             )
+
+#         if instance.author not in superusers:
+#              Notification.objects.create(
+#                 user=instance.author,
+
+#                 #  yo use garna mildaina kna bhaney yesle post ko author lai access gana sakidaina so use this in update_post ma 
+#                 # message=f" Post '{instance.title}' has been updated by {instance.author}"
+#                  message=f" Post '{instance.title}' has been updated "
+
+#             )
+
+
+#  to notify after categoryadd
+@receiver(post_save, sender= Category)
+def notifyAfterCategoryAdd(sender, instance, created, *args, **kwargs):
+    if created:
+
+        users= User.objects.filter(Q (is_superuser=True) | Q(is_staff=True))
+
+        for admin in users:
+            Notification.objects.create(
+                user=admin,
+                message=f"New category {instance.name} was added "
+
+            )
+
+
+#  to notify after category update
+@receiver(post_save, sender= Category)
+def notifyAfterCategoryUpdate(sender, instance, created, *args, **kwargs):
+    if not created:
+         
+         users= User.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
+
+         for admin in users:
+            Notification.objects.create(
+                user=admin,
+                message=f"Category {instance.name} was updated "
+            )
+
+
+
+#  to notify after categorydelete
+@receiver(post_delete, sender= Category)
+def notifyAfterCategoryDelete(sender, instance, *args, **kwargs):
+
+         users= User.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
+
+         for admin in users:
+            Notification.objects.create(
+                user=admin,
+                message=f"Category {instance.name} was deleted "
+
+            )
+
+
+
+#  to notify after commentsaddition
+@receiver(post_save, sender=Comment)
+def notifyAfterCommentsAdd(sender, instance, created, *args, **kwargs):
+    if created:
+            
+            posts=instance.post
+
+            users=User.objects.filter(is_superuser=True)
+
+            for admin in users:
+                Notification.objects.create(
+                    user=admin,
+                    message=f"Comment '{instance.content}' was added by '{instance.author}' in '{posts.title}' "
+                )
+
+
+            Notification.objects.create(
+            user=posts.author,
+            message=f"Comment '{instance.content}' was added by '{instance.author}' in '{posts.title}' "
+            )
+         
+
+
+
+#  to notify after categorydeletion
+@receiver(post_save, sender=Comment)
+def notifyAfterCommentDelete(sender,instance, created, *args, **kwargs):
+    if not created:
+
+        posts=instance.post
+
+
+        users=User.objects.filter(is_superuser=True)
+        for admin in users:
+            Notification.objects.create(
+                user=admin,
+                message=f"Commene '{instance.content}' is deleted by '{instance.author}' "
+            )
+
+
+            Notification.objects.create(
+            user=posts.author,
+            message=f"Comment '{instance.content}' was deleeted by '{instance.author}' in '{posts.title}' "
+            )
