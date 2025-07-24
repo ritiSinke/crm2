@@ -110,6 +110,7 @@ def update_post(request, pk):
         form = fm.PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
+
             
             # Send notifications to other staff users
             superusers=User.objects.filter(is_superuser=True)
@@ -367,7 +368,7 @@ class ContactView(FormView):
     
     def form_invalid(self, form):
         messages.error(self.request, "There was an error sending your message. Please try again.")
-        return super().form_invalid(form)
+        return 
    
 
 #  to get category posts

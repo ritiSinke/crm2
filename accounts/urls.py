@@ -29,5 +29,8 @@ urlpatterns=[
     path('user-status-update/<int:pk>/', views.UserStatusUpdate.as_view(), name='user_status_update'),
     path('user-add', views.UserAddView.as_view(),name="add_user"),
     path('user-delete/<int:pk>/', views.UserDeleteView.as_view(), name='delete_user'),
+
+    path('update-staff-profile/',views.UpdateStaffProfile.as_view(),name='staff_udpate_profile'),
+    path('change-staff-password/', views.StaffPasswordChange.as_view(),name='staff_password_change')
 ]   
  

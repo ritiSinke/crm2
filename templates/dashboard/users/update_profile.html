@@ -1,0 +1,15 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+<div class="card">
+  <h5 class="card-header">Update Profile for {{ request.user.username }}</h5>
+  <div class="card-body">
+    <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="w-100 btn btn-lg btn-primary" type="submit">Update Profile</button>
+    </form>
+  </div>
+
+  {% endblock content %}
