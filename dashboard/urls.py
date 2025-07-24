@@ -16,5 +16,6 @@ urlpatterns =[
     path('author-list/',views.AuthorListView.as_view(), name='author_list'),
     path('contact-list/', views.ContactInfoView.as_view(), name='contact_info'),
     path('contact-details/<int:pk>/', views.ContactDetailsView.as_view(), name='contact_details'),
+    path('all-notifications/', views.NotificationView.as_view(), name='view_all_notifications'),
     
 ]

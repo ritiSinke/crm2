@@ -1,17 +1,21 @@
-from .models import Post, Notification, Category, Comment
+from .models import Post, Notification, Category, Comment, Contact 
 from django.db.models.signals import post_save,post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from accounts.models import User
 
+Users= get_user_model()
 
-User= get_user_model()
+# Temporary store to hold old user data between pre_save and post_save
+old_user_cache = {}
+
 
 #  to notify after postaddition
 @receiver (post_save, sender= Post)
 def notifySuperuserAfterPostAdd(sender, instance, created , **kwargs):
      if created: 
-        users= User.objects.filter(is_superuser=True)
+        users= Users.objects.filter(is_superuser=True)
 
         for admin in users:
             Notification.objects.create(
@@ -25,7 +29,7 @@ def notifySuperuserAfterPostAdd(sender, instance, created , **kwargs):
 @receiver(post_delete, sender=Post)
 def notifySuperuserAfterPostDelete(sender, instance, **kwargs):
 
-    superusers= User.objects.filter(is_superuser=True)
+    superusers= Users.objects.filter(is_superuser=True)
 
     for admin in superusers:
      Notification.objects.create(
@@ -70,7 +74,7 @@ def notifySuperuserAfterPostDelete(sender, instance, **kwargs):
 def notifyAfterCategoryAdd(sender, instance, created, *args, **kwargs):
     if created:
 
-        users= User.objects.filter(Q (is_superuser=True) | Q(is_staff=True))
+        users= Users.objects.filter(Q (is_superuser=True) | Q(is_staff=True))
 
         for admin in users:
             Notification.objects.create(
@@ -85,7 +89,7 @@ def notifyAfterCategoryAdd(sender, instance, created, *args, **kwargs):
 def notifyAfterCategoryUpdate(sender, instance, created, *args, **kwargs):
     if not created:
          
-         users= User.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
+         users= Users.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
 
          for admin in users:
             Notification.objects.create(
@@ -99,7 +103,7 @@ def notifyAfterCategoryUpdate(sender, instance, created, *args, **kwargs):
 @receiver(post_delete, sender= Category)
 def notifyAfterCategoryDelete(sender, instance, *args, **kwargs):
 
-         users= User.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
+         users= Users.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
 
          for admin in users:
             Notification.objects.create(
@@ -117,7 +121,7 @@ def notifyAfterCommentsAdd(sender, instance, created, *args, **kwargs):
             
             posts=instance.post
 
-            users=User.objects.filter(is_superuser=True)
+            users=Users.objects.filter(is_superuser=True)
 
             for admin in users:
                 Notification.objects.create(
@@ -142,7 +146,7 @@ def notifyAfterCommentDelete(sender,instance, created, *args, **kwargs):
         posts=instance.post
 
 
-        users=User.objects.filter(is_superuser=True)
+        users=Users.objects.filter(is_superuser=True)
         for admin in users:
             Notification.objects.create(
                 user=admin,
@@ -153,4 +157,106 @@ def notifyAfterCommentDelete(sender,instance, created, *args, **kwargs):
             Notification.objects.create(
             user=posts.author,
             message=f"Comment '{instance.content}' was deleeted by '{instance.author}' in '{posts.title}' "
+            )
+
+
+
+@receiver(post_save, sender= User)
+def noftifyAfterUserAdd(sender,instance,created, *args, **kwargs):
+    if created:
+
+       users=Users.objects.filter(is_superuser=True)
+
+       for admin in users:
+           Notification.objects.create(
+               user=admin,
+               message=f"New user '{instance.username}' has been created "
+           )
+
+
+
+# @receiver(post_save,sender=User)
+# def notifyAfterUserUpdate(sender, instance, created, *args, **kwargs):
+
+#     if not created:
+
+#         users=User.objects.filter(is_superuser=True)
+
+#         for admin in users:
+#             Notification.objects.create(
+#                 user=admin,
+#                 message=f"User {instance.username} has been updated "
+#             )
+
+
+
+
+
+# from django.db.models.signals import pre_save
+
+# @receiver(pre_save, sender=User)
+# def cache_old_user(sender, instance, **kwargs):
+#     if instance.pk:  # Only for existing users
+#         try:
+#             old_user = User.objects.get(pk=instance.pk)
+#             old_user_cache[instance.pk] = old_user
+#         except User.DoesNotExist:
+#             pass
+
+
+# @receiver(post_save, sender=User)
+# def notify_user_changes(sender, instance, created, **kwargs):
+#     superusers = User.objects.filter(is_superuser=True)
+
+#     if created:
+#         message = f"New user '{instance.username}' has been created"
+
+#     else:
+#         old_user = old_user_cache.pop(instance.pk, None)  # Remove after use
+
+#         if not old_user:
+#             return  # No cached user found
+
+#         fields_to_check = ['username', 'email', 'first_name', 'last_name','password']
+
+#         has_real_changes = any(
+#             getattr(old_user, field) != getattr(instance, field)
+#             for field in fields_to_check
+#         )
+
+#         if not has_real_changes:
+#             return  
+
+#         message = f"User '{instance.username}' has been updated"
+
+#     for admin in superusers:
+#         Notification.objects.create(user=admin, message=message)
+
+
+
+
+@receiver(post_delete, sender=User)
+def notifyAfterUserDelete(sender, instance, *args, **kwargs):
+
+    users= Users.objects.filter(is_superuser=True)
+    for admin in users:
+        Notification.objects.create(
+            user=admin,
+            message=f"User '{instance.username}' has beeen deleted "
+        )
+
+
+from django.urls import reverse
+
+@receiver(post_save, sender=Contact)
+def notifyAfterContactFormSubmission(sender, created, instance, *args, **kwargs):
+    if created:
+
+        users=User.objects.filter(is_superuser=True)
+
+
+        for admin in users:
+            Notification.objects.create(
+                user=admin,
+                message=f"New Contact request  sent by '{instance.name}' ",
             )

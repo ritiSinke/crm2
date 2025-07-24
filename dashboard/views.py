@@ -76,7 +76,6 @@ class CategoryListView(LoginRequiredMixin, TemplateView):
 
   
     
-from post.models import Notification
 class CategoryAddView( SuperUserRequiredMixin, FormView):
     template_name = 'dashboard/category/add_category.html'
     form_class = CategoryForm
@@ -92,6 +91,7 @@ class CategoryAddView( SuperUserRequiredMixin, FormView):
     def form_invalid(self, form):
         messages.error(self.request, 'Error adding category')
         return self.render_to_response(self.get_context_data(form=form))
+    
     
 class CategoryUpdateView(SuperUserRequiredMixin, FormView):
     template_name = 'dashboard/category/update_category.html'
@@ -199,4 +199,13 @@ class ContactDetailsView(SuperUserRequiredMixin,DetailView):
 
 
 
+from post.models import Notification
 
+class NotificationView(ListView):
+    template_name='dashboard/users/all_notifications.html'
+    model=Notification
+    context_object_name='notification'
+
+    def get_queryset(self):
+          return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+    

@@ -1,0 +1,22 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+
+    <div class="card m-2">
+
+                {% for notification in notification %}
+
+                    <h5> {{notification.message}}</h5>
+                    <p>{{notification.created_at}} </p>
+                    <hr>
+
+                {% endfor %}
+               
+
+        
+    </div>
+    
+    
+{% endblock%}
+
+    

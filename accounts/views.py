@@ -2,8 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from . import forms as fm 
-from django.contrib.auth.decorators import login_required 
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.views.generic import FormView
 from django.contrib.auth.views import LogoutView, PasswordChangeView
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
@@ -16,6 +15,8 @@ from django.views import View
 from django.contrib.auth import get_user_model
 
 
+
+Users=get_user_model()
 # Create your views here.
 
 #register_user
@@ -130,13 +131,25 @@ class CustomPasswordChangeView(PasswordChangeView):
     def form_valid(self,form):
 
         self.object = form.save()
-
+    
+        
+        superuser= Users.objects.filter(is_superuser=True)
+        for admin in superuser:
+        
+          Notification.objects.create(
+        
+              user=admin,
+        
+              message=f"Password of  '{ self.object.username}' has been changed "
+        
+          )
         messages.success(self.request,"Password Changed Successfully")
         return super().form_valid(form)    
     
 
 # user ko profile update garna ko lagi
 class UpdateProfileView(View):
+
     def get(self, request):
         form = fm.UserProfileUpdateForm(instance=request.user)
         return render(request, 'accounts/update_profile.html', {'form': form})
@@ -145,8 +158,18 @@ class UpdateProfileView(View):
         form = fm.UserProfileUpdateForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
+
+            
+            superuser= Users.objects.filter(is_superuser=True)
+
+            for admin in superuser:
+              Notification.objects.create(
+                  user=admin,
+                  message=f"User '{form.instance.username}' has been updated"
+              )
+
             messages.success(request, "Profile updated successfully")
-            return redirect('dashboard')
+            return redirect('all-posts')
         else:
             messages.error(request, "Error updating profile")
             return render(request, 'accounts/update_profile.html', {'form': form})
@@ -156,8 +179,9 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView
-from . import forms as fm  # Adjust if needed
-
+from . import forms as fm  
+from django.contrib.auth import get_user_model
+from post.models import Notification
 class UserStatusUpdate(UpdateView):
     model = get_user_model()
     template_name = 'dashboard/users/change_status.html'
@@ -165,9 +189,21 @@ class UserStatusUpdate(UpdateView):
     success_url = reverse_lazy('user_list')
 
     def form_valid(self, form):
-        self.object = form.save()
+
+        print("form_valid called!")
+
         messages.success(self.request, 'User status updated successfully')
-        return super().form_valid(form)
+        response = super().form_valid(form)  # only save once here
+
+
+        superuser= Users.objects.filter(is_superuser=True)
+
+        for admin in superuser:
+            Notification.objects.create(
+                user=admin,
+                message=f"User '{self.object.username}' has been updated"
+            )
+        return response
     
    
 
@@ -201,3 +237,52 @@ class UserDeleteView(DeleteView):
         return redirect(self.success_url)
 
   
+
+class UpdateStaffProfile(View):
+
+    def get(self, request):
+        form = fm.UserProfileUpdateForm(instance=request.user)
+        return render(request, 'dashboard/users/update_profile.html', {'form': form})
+
+    def post(self, request):
+        form = fm.UserProfileUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+
+            
+            superuser= Users.objects.filter(is_superuser=True)
+
+            for admin in superuser:
+              Notification.objects.create(
+                  user=admin,
+                  message=f"User '{form.instance.username}' has been updated"
+              )
+
+            messages.success(request, "Profile updated successfully")
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Error updating profile")
+            return render(request, 'dashboard/users/update_profile.html', {'form': form})
+
+
+class StaffPasswordChange(PasswordChangeView):
+
+        template_name='dashboard/users/forget_password.html'
+        success_url=reverse_lazy('login')
+        form_class=fm.UserPasswordChangeForm
+
+        def form_valid(self, form):
+            
+            self.object= form.save()
+
+            superuser=Users.objects.filter(is_superuser=True)
+
+            for admin in superuser:
+                Notification.objects.create(
+                    user=admin,
+                    message=f" Password of '{ self.object.username}' has been changed "
+                )
+            return super().form_valid(form)
+        
+
+
