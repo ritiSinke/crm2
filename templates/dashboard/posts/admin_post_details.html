@@ -81,6 +81,10 @@
                             {{ comment.content }}
 
                             {% if user.is_authenticated %}
+                                {% if user.is_superuser %}
+                                    <a href="{% url 'edit_comment' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+                                {% endif %}
+
                                 <button class="btn btn-link btn-sm p-0" type="button" onclick="toggleReplyForm({{ comment.id }})">Reply</button>
                                 <form method="POST" id="reply-form-{{ comment.id }}" style="display:none; margin-top:10px;">
                                     {% csrf_token %}
@@ -94,7 +98,12 @@
                                 <div class="ms-3 mt-2 border-start ps-2">
                                     <strong>{{ reply.author.username }}</strong> ({{ reply.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
                                     {{ reply.content }}
+                                      {% if user.is_superuser %}
+                                    <a href="{% url 'edit_comment' reply.id %}"/> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+                                {% endif %}
                                 </div>
+                              
+
                             {% endfor %}
                         </div>
                     {% empty %}

@@ -64,6 +64,9 @@
                             
                             <strong>{{ comment.author.username }}</strong> ({{ comment.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
                             {{ comment.content }}
+                            {% if request.user == comment.author%}
+                                <a href="{% url 'edit_comment_users' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+                            {% endif %} 
 
                             {% if user.is_authenticated %}
                                 <button class="btn btn-link btn-sm p-0" type="button" onclick="toggleReplyForm({{ comment.id }})">Reply</button>
@@ -79,6 +82,9 @@
                                 <div class="ms-3 mt-2 border-start ps-2">
                                     <strong>{{ reply.author.username }}</strong> ({{ reply.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
                                     {{ reply.content }}
+                                    {% if comment.author == request.user%}
+                                        <a href="{% url 'edit_comment_users' reply.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+                                    {% endif %}
                                 </div>
                             {% endfor %}
                         </div>
