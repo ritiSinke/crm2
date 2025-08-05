@@ -20,3 +20,6 @@ def notificationsView(request):
         }
     return {'notifications': []}
     
+
+
+

@@ -11,10 +11,7 @@
       <tr>
         <th scope="col">SN</th>
         <th scope="col">Name</th>
-        <th scope="col"> Email </th>
-        <th scope="col"> Date Sent </th>
         <th scope="col"> Subject </th>
-        <th scope="col"> Message </th>
         <th scope="col"> Action </th>
         
 
@@ -25,10 +22,7 @@
                 <tr>  
                     <td> {{forloop.counter}}</td>
                     <td>{{contact.name}}</td>
-                    <td> {{ contact.email}} </td>
-                    <td> {{ contact.date_sent}} </td>
                     <td> {{contact.subject}}</td>
-                    <td> {{ contact.message| truncatechars:"15"}} </td>
                     <td style="border-right: 1px solid #dee2e6;">
                               <a href="{% url 'contact_details' contact.pk%}" class="btn btn-primary">View</a>
                     </td>                          

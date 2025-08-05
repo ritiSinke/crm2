@@ -16,10 +16,13 @@
                     <div class="bg-white border border-top-0 p-4">
                         <div class="mb-3">
                            <h1> {{contacts.name}} </h1>
+                           
                             <a class="text-body" href="">{{ contacts.email }}</a>
                         </div>
-                        <h1 class="mb-3 text-secondary font-weight-bold">Subject: {{ contacts.subject }}</h1>
+                        <h1 class="mb-3 ">Subject: {{ contacts.subject }}</h1>
                         
+                        <br> 
+                        <h5> Message: </h5>
                         <p>{{ contacts.message|linebreaks }}</p>
                     </div>
                     

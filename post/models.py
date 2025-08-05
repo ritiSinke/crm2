@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 
 
 # Create your models here.
@@ -7,10 +8,15 @@ User = get_user_model()
 
 class Category(models.Model):
     name=models.CharField(max_length=100)
-
-    def __str__(self):
+    
+    
+    def __str__(self):     
         return self.name
     
+    
+    def get_absolute_url(self):
+        return reverse("category_list")    
+
 
 class Post(models.Model):
     category= models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
@@ -30,11 +36,18 @@ class Post(models.Model):
    
     image= models.ImageField( upload_to='images', null=True, blank=True)
 
+    def get_absolute_url(self):
+        return reverse('admin_post_details', kwargs={"pk": self.pk})
+    
+
 
 class PostLike(models.Model):
     reader= models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     like_count = models.PositiveIntegerField(null=True, editable=True, default=0)
+
+    def get_absolute_url(self):
+        return reverse('admin_post_details', kwargs={"pk": self.pk})
 
 
 
@@ -48,6 +61,9 @@ class Comment(models.Model):
 
     parents=models.ForeignKey('self', on_delete=models.CASCADE, related_name='replies',blank=True, null=True)
 
+    def get_absolute_url(self):
+        return reverse('admin_post_details', kwargs={"pk": self.post.pk})
+
 
 
 
@@ -59,10 +75,20 @@ class Contact(models.Model):
     message = models.TextField()
     date_sent = models.DateTimeField(auto_now_add=True)
 
+    
+    def get_absolute_url(self):
+        return reverse("contact_details", kwargs={"pk": self.pk})
+    
+
 
 
 class Notification(models.Model):
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    model_name= models.TextField(blank=True, null=True)
+    model_id= models.IntegerField(null=True, blank=True)
+
+    redirect_urls=models.URLField(blank=True, null=True)

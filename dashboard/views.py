@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from post.views import SuperUserRequiredMixin
-
+from accounts.views import StaffOrSuperuserRequiredMixin
 # Create your views here.
 
 
@@ -24,7 +24,7 @@ def dashboard(request):
         return redirect('all-posts')
     
 
-    notifications = request.user.notifications.order_by('-created_at')[:10]
+
 
     return render(request, 'dashboard/index_dashboard.html',{
         'admin': admin,
@@ -32,8 +32,8 @@ def dashboard(request):
         'categories' : Category.objects.count(),
         'users' :User.objects.count(), 
         'authors' :User.objects.filter(is_staff=True).count(),
-        'notifications': notifications,   
-
+        'author_posts': Post.objects.filter(author=request.user).count(),
+        
     })
 
 
@@ -64,7 +64,7 @@ class UserListView(SuperUserRequiredMixin, ListView):
     
 
 
-class CategoryListView(LoginRequiredMixin, TemplateView):
+class CategoryListView(StaffOrSuperuserRequiredMixin, TemplateView):
     template_name = 'dashboard/category/category_list.html' 
     model=Category 
 
@@ -82,6 +82,7 @@ class CategoryAddView( SuperUserRequiredMixin, FormView):
     success_url = reverse_lazy('category_list')
 
     def form_valid(self, form):
+
         form.save()
 
 
@@ -201,7 +202,8 @@ class ContactDetailsView(SuperUserRequiredMixin,DetailView):
 
 from post.models import Notification
 
-class NotificationView(ListView):
+
+class NotificationView(ListView, StaffOrSuperuserRequiredMixin):
     template_name='dashboard/users/all_notifications.html'
     model=Notification
     context_object_name='notification'

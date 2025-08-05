@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from . import forms as fm 
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.views.generic import FormView
 from django.contrib.auth.views import LogoutView, PasswordChangeView
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
@@ -13,11 +13,26 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.views import View
 from django.contrib.auth import get_user_model
-
-
+from post.views import SuperUserRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 Users=get_user_model()
 # Create your views here.
+
+
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import HttpResponseForbidden
+
+class StaffOrSuperuserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        user = self.request.user
+        return user.is_staff or user.is_superuser
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden('You are not authorised to access this page')
+        return super().handle_no_permission()
+
 
 #register_user
 # def register_user(request):
@@ -75,7 +90,12 @@ class LoginView(FormView):
 
 
     def form_valid(self, form):
+        user = form.get_user()
+
         auth_login(self.request, form.get_user())
+
+        self.request.session['username'] = user.username
+
        
         if  self.request.user.is_superuser or self.request.user.is_staff:
             messages.success(self.request, "Login Successfully!")
@@ -123,7 +143,7 @@ class LogoutView(View):
 
 
 
-class CustomPasswordChangeView(PasswordChangeView):
+class CustomPasswordChangeView(PasswordChangeView,LoginRequiredMixin):
     template_name='accounts/change_password.html'
     success_url=reverse_lazy( 'login')
     form_class = fm.UserPasswordChangeForm
@@ -140,7 +160,9 @@ class CustomPasswordChangeView(PasswordChangeView):
         
               user=admin,
         
-              message=f"Password of  '{ self.object.username}' has been changed "
+              message=f"Password of  '{ self.object.username}' has been changed ",
+              model_name="accounts.User",
+              model_id=self.object.id
         
           )
         messages.success(self.request,"Password Changed Successfully")
@@ -148,7 +170,7 @@ class CustomPasswordChangeView(PasswordChangeView):
     
 
 # user ko profile update garna ko lagi
-class UpdateProfileView(View):
+class UpdateProfileView(View, LoginRequiredMixin):
 
     def get(self, request):
         form = fm.UserProfileUpdateForm(instance=request.user)
@@ -165,7 +187,9 @@ class UpdateProfileView(View):
             for admin in superuser:
               Notification.objects.create(
                   user=admin,
-                  message=f"User '{form.instance.username}' has been updated"
+                  message=f"User '{form.instance.username}' has been updated", 
+                  model="accounts.User",
+                  model_id=form.instance.id 
               )
 
             messages.success(request, "Profile updated successfully")
@@ -175,6 +199,10 @@ class UpdateProfileView(View):
             return render(request, 'accounts/update_profile.html', {'form': form})
         
 
+
+#  superuser lai matra access dinney banauney 
+
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
@@ -182,7 +210,7 @@ from django.views.generic import UpdateView
 from . import forms as fm  
 from django.contrib.auth import get_user_model
 from post.models import Notification
-class UserStatusUpdate(UpdateView):
+class UserStatusUpdate(UpdateView, SuperUserRequiredMixin):
     model = get_user_model()
     template_name = 'dashboard/users/change_status.html'
     form_class = fm.UserUpdateForm
@@ -201,13 +229,15 @@ class UserStatusUpdate(UpdateView):
         for admin in superuser:
             Notification.objects.create(
                 user=admin,
-                message=f"User '{self.object.username}' has been updated"
+                message=f"User '{self.object.username}' has been updated",
+                model_name="accounts.User",
+                model_id=self.object.id
             )
         return response
     
    
 
-class UserAddView(CreateView):
+class UserAddView(CreateView, SuperUserRequiredMixin):
 
     template_name='dashboard/users/user_addition.html'
     form_class=fm.AddUserForm
@@ -224,7 +254,7 @@ class UserAddView(CreateView):
    
     
 
-class UserDeleteView(DeleteView):
+class UserDeleteView(DeleteView, SuperUserRequiredMixin):
 
     model=get_user_model()
     template_name='dashboard/user_delete.html'
@@ -238,7 +268,7 @@ class UserDeleteView(DeleteView):
 
   
 
-class UpdateStaffProfile(View):
+class UpdateStaffProfile(View, StaffOrSuperuserRequiredMixin):
 
     def get(self, request):
         form = fm.UserProfileUpdateForm(instance=request.user)
@@ -255,7 +285,9 @@ class UpdateStaffProfile(View):
             for admin in superuser:
               Notification.objects.create(
                   user=admin,
-                  message=f"User '{form.instance.username}' has been updated"
+                  message=f"User '{form.instance.username}' has been updated",
+                  model_name="accounts.User",
+                  model_id= form.instance.id
               )
 
             messages.success(request, "Profile updated successfully")
@@ -265,7 +297,7 @@ class UpdateStaffProfile(View):
             return render(request, 'dashboard/users/update_profile.html', {'form': form})
 
 
-class StaffPasswordChange(PasswordChangeView):
+class StaffPasswordChange(PasswordChangeView,StaffOrSuperuserRequiredMixin):
 
         template_name='dashboard/users/forget_password.html'
         success_url=reverse_lazy('login')
@@ -280,9 +312,19 @@ class StaffPasswordChange(PasswordChangeView):
             for admin in superuser:
                 Notification.objects.create(
                     user=admin,
-                    message=f" Password of '{ self.object.username}' has been changed "
+                    message=f" Password of '{ self.object.username}' has been changed ",
+                    model_name="accounts.User",
+                    model_id=self.object.id
                 )
             return super().form_valid(form)
         
 
 
+
+#  user ko details view garney 
+class UserDetailView(DetailView, SuperUserRequiredMixin):
+    model= Users
+    template_name = 'dashboard/users/users_details.html'
+    context_object_name = 'users'
+
+   

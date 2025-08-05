@@ -119,7 +119,10 @@ def update_post(request, pk):
             for admin in superusers:
                 Notification.objects.create(
                     user=admin,
-                    message=f" Post '{post.title}' has been updated by {editor.username}"
+                    message=f" Post '{post.title}' has been updated by {editor.username}",
+                    model_name="post.Post",
+                    model_id=post.id
+
                 )
 
             if post.author not in superusers:
@@ -127,7 +130,9 @@ def update_post(request, pk):
                     user=post.author,
 
                     #  yo use garna mildaina kna bhaney yesle post ko author lai access gana sakidaina so use this in update_post ma 
-                    message=f" Post '{post.title}' has been updated by {editor.username}"
+                    message=f" Post '{post.title}' has been updated by {editor.username}",
+                    model_name="post.Post",
+                    model_id=post.id
 
 #             )
 
@@ -217,6 +222,8 @@ def post_details(request,pk):
 
 
 #author posts
+@login_required
+@staff_member_required
 def author_posts(request,pk):
    author = get_user_model().objects.get(pk=pk)
    posts = Post.objects.filter(author=author, is_draft='False')
@@ -243,7 +250,7 @@ from django.core.paginator import Paginator
 #     }
 #     return render(request, 'dashboard/posts/my_post.html', context)
 
-class AuthorPostView(ListView):
+class AuthorPostView(ListView, ):
 
     model= Post
     template_name="dashboard/posts/my_post.html"
@@ -283,13 +290,17 @@ def like_post(request, pk):
         for admin in superusers:
             Notification.objects.create(
                 user=admin,
-                message=f"{request.user.username} liked the post: '{post.title}'"
+                message=f"{request.user.username} liked the post: '{post.title}'", 
+                model_name="post.Post",
+                model_id=post.id
             )
 
         if post.author not in superusers:
             Notification.objects.create(
                     user=post.author,
-                    message=f"{request.user.username} liked your post: '{post.title}'"
+                    message=f"{request.user.username} liked your post: '{post.title}'",
+                    model_name="post.Post",
+                    model_id= post.id
                 )
 
         if request.user.is_superuser or request.user.is_staff:
@@ -508,3 +519,64 @@ class MarkAllNorificationRead(LoginRequiredMixin,View):
         request.user.notifications.filter(is_read=False).update(is_read=True)
         return JsonResponse({'status': 'success'})
 
+
+
+
+from django.http import HttpResponseNotFound
+from django.shortcuts import redirect
+from .models import Notification  # adjust as per your project structure
+from django.apps import apps
+
+def notificationDetailView(request, pk):
+    notification=get_object_or_404(Notification, pk=pk, user=request.user)
+    model_class= get_model_from_string(notification.model_name)
+    model_id=notification.model_id
+
+    if not model_class:
+        return HttpResponseNotFound('Model not found')
+    
+    try:
+        model_instance = model_class.objects.get(id=model_id)
+
+        # notification = Notification.objects.get(id=pk)
+    except model_class.DoesNotExist:
+        return HttpResponseNotFound('Notification not found')
+
+    print('noti', notification.model_name)
+
+    # Fetch model class from string
+    # model_class = get_model_from_string(notification.model_name)
+    # model_id = notification.model_id
+    # print('model', model_class)
+
+    # if not model_class:
+    #     return HttpResponseNotFound('Model not found')
+
+    # try:
+    #     model_instance = model_class.objects.get(id=model_id)
+    # except model_class.DoesNotExist:
+    #     return HttpResponseNotFound('Model instance not found')
+
+    notification.is_read = True
+    notification.save()
+
+    if hasattr(model_instance, "get_absolute_url"):
+        return redirect(model_instance.get_absolute_url())
+    else:
+        return HttpResponseNotFound('Details view not found')
+
+
+
+from django.apps import apps
+
+def get_model_from_string(model_string):
+    """
+    Expects model_string in the format 'app_label.ModelName'
+    Example: 'post.Category'
+    """
+    try:
+        app_label, model_name = model_string.split(".")
+        return apps.get_model(app_label=app_label, model_name=model_name)
+    except Exception as e:
+        print(f"Model resolution error: {e}")
+        return None

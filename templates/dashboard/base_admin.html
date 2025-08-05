@@ -23,15 +23,14 @@
 <body data-sidebar="dark">
 
     {% if messages %}
-        <div class="col-md-10 offset-md-2">
-
-                {% for message in messages %}
-                    <div class="alert alert-{{message.tags}}" role="alert">
-                        {{ message }}
-                    </div>
-                    {% endfor %}
-                
-        </div>
+        {% for message in messages %}
+           <div class="col-md-10 offset-md-2">
+                <div class="alert alert-{{message.tags}}" role="alert">
+                    {{ message }}
+                </div>
+            </div>
+            {% endfor %}
+      
     {% endif %}
 
     <!-- Begin page -->
@@ -100,20 +99,25 @@
                                             <div class="d-flex">
                                                 <div class="flex-shrink-0 me-3">
                                                     {% if notification.avatar %}
-                                                        <img src="{% static notification.avatar %}" class="rounded-circle avatar-xs" alt="user-pic">
+                                                        {% comment %} <img src="{% static notification.avatar %}" class="rounded-circle avatar-xs" alt="user-pic"> {% endcomment %}
                                                     {% else %}
                                                         <div class="avatar-xs">
-                                                            <span class="avatar-title {{ notification.bg_class }} rounded-circle font-size-16">
-                                                                <i class="{{ notification.icon }}"></i>
-                                                            </span>
+                                                            <a href="{% url 'notification_details' pk=notification.id %}"> 
+                                                                <span class="avatar-title {{ notification.bg_class }} rounded-circle font-size-16">
+                                                                    <i class="ri-chat-smile-2-line ml-2"></i>
+                                                                </span>
+                                                            </a>
                                                         </div>
                                                     {% endif %}
                                                 </div>
                                                 <div class="flex-grow-1">
                                                     <div class="font-size-12 text-muted">
-                                                        <p class="mb-1">{{ notification.message }}</p>
-                                                        <p class="mb-0"><i class="mdi mdi-clock-outline"></i> {{ notification.created_at }}</p>
+                                                        <a href="{% url 'notification_details' pk=notification.id %}" > 
+                                                            <p class="mb-1">{{ notification.message }}</p>
+                                                            <p class="mb-0"><i class="mdi mdi-clock-outline"></i> {{ notification.created_at }}</p>
+                                                        </a>
                                                     </div>
+                                                    <hr> 
                                                 </div>
                                             </div>
                                         </a>
@@ -132,13 +136,13 @@
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <img class="rounded-circle header-profile-user" src="{% static 'dist/assets/images/users/avatar-2.jpg' %}"
                                     alt="Header Avatar">
-                                <span class="d-none d-xl-inline-block ms-1">{{ user.username }}</span>
+                                <span class="d-none d-xl-inline-block ms-1">{{ request.user.username }}</span>
                                 <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <!-- item-->
                                 <a class="dropdown-item" href="{% url 'staff_udpate_profile' %}"><i class="ri-user-line align-middle me-1"></i> Profile</a>
-                                <a class="dropdown-item" href="{% url 'staff_password_change' %}"><i class="ri-user-line align-middle me-1"></i> Change Password </a>
+                                <a class="dropdown-item" href="{% url 'staff_password_change' %}"><i class="ri-key-fill align-middle me-1"></i> Change Password </a>
 
                                 {% comment %} <a class="dropdown-item" href="#"><i class="ri-wallet-2-line align-middle me-1"></i> My Wallet</a>
                                 <a class="dropdown-item d-block" href="#"><span class="badge bg-success float-end mt-1">11</span><i class="ri-settings-2-line align-middle me-1"></i> Settings</a>
@@ -200,8 +204,8 @@
 
                             <li>
                                 <a href="#" class="has-arrow waves-effect">
-                                    <i class="mdi mdi-account-cog"></i>
-                                    <span>Post</span>
+                                <i class="ri-file-list-3-fill"></i>        
+                            <span>Post</span>
                                 </a>
                                 <ul class="sub-menu" aria-expanded="false">
                                     <li><a href="{% url 'add-post' %}">Create Post</a></li>
@@ -217,7 +221,7 @@
 
                              <li>
                                 <a href="#" class="has-arrow waves-effect">
-                                    <i class="mdi mdi-account-cog"></i>
+                                    <i class="ri-list-check-2"></i>
                                     <span>Category </span>
                                 </a>
 
@@ -236,7 +240,7 @@
                             {%  if request.user.is_superuser%}
                                 <li>
                                     <a href="#" class="has-arrow waves-effect">
-                                        <i class="mdi mdi-account-cog"></i>
+                                        <i class="ri-chat-1-line"></i>
                                         <span>Comments</span>
                                     </a>
                                     <ul class="sub-menu" aria-expanded="false">
@@ -248,7 +252,7 @@
                             {%  if request.user.is_superuser%}
                             <li>
                                 <a href=" {% url 'contact_info' %}" >
-                                    <i class="mdi mdi-account-cog"></i> 
+                                    <i class="ri-contacts-line"></i>
                                     <span>Contact Request  </span>
                                     
                                 </a>
