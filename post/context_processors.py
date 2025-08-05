@@ -15,7 +15,7 @@ def notificationsView(request):
         has_read_notifications= request.user.notifications.filter(is_read=False).exists
 
         return {
-            'notifications':  request.user.notifications.order_by('-created_at')[:10],
+            'notifications':  request.user.notifications.order_by('-created_at')[:20],
              'has_read_notifications': has_read_notifications
         }
     return {'notifications': []}

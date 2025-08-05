@@ -580,3 +580,47 @@ def get_model_from_string(model_string):
     except Exception as e:
         print(f"Model resolution error: {e}")
         return None
+
+
+
+from django.views.generic.edit import UpdateView
+class EditCommentView(SuperUserRequiredMixin, UpdateView ):
+    model=Comment
+    template_name='dashboard/comments/edit_comments.html'
+    form_class = CommentForm
+    context_object_name = 'comment'
+
+    def get_success_url(self):
+        return reverse_lazy('admin_post_details', kwargs={'pk': self.object.post.pk})
+    
+
+    def form_valid(self, form):
+        comment = form.save(commit=False)
+        comment.author = self.request.user
+        comment.save()
+        
+        messages.success(self.request, 'Comment updated successfully')
+        return super().form_valid(form)
+
+
+
+
+class EditCommentUserView(LoginRequiredMixin, UpdateView):
+    model=Comment
+    template_name='post/edit_comment.html'
+    form_class=CommentForm
+    context_object_name = 'comment'
+
+
+    def get_success_url(self):
+        return reverse_lazy('post-details', kwargs={'pk': self.object.post.pk})
+
+    def  form_valid(self, form):
+        comment = form.save(commit=False)
+        comment.author = self.request.user
+        comment.save()
+
+        messages.success(self.request, 'Comment updated successfully')
+
+        return super().form_valid(form)
+    

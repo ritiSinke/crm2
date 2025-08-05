@@ -32,6 +32,9 @@ urlpatterns=[
     path('search/',views.SearchPostView.as_view(), name='search'),
     path ('mark-as-read/',views.MarkAllNorificationRead.as_view(), name='mark_all_read'),
     path ('notification-details/<int:pk>/redirect/',views.notificationDetailView, name='notification_details'),
+    path('edit-comment/<int:pk>/', views.EditCommentView.as_view(), name='edit_comment'),
+    path('edit_comment-users/<int:pk>/', views.EditCommentUserView.as_view(), name='edit_comment_users'),
+    
 
 
 ] + static( settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
