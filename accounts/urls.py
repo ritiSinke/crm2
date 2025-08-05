@@ -31,6 +31,8 @@ urlpatterns=[
     path('user-delete/<int:pk>/', views.UserDeleteView.as_view(), name='delete_user'),
 
     path('update-staff-profile/',views.UpdateStaffProfile.as_view(),name='staff_udpate_profile'),
-    path('change-staff-password/', views.StaffPasswordChange.as_view(),name='staff_password_change')
+    path('change-staff-password/',views.StaffPasswordChange.as_view(),name='staff_password_change'),
+    path('user-details/<int:pk>/', views.UserDetailView.as_view(), name='user_details'),
+
 ]   
  

@@ -11,38 +11,59 @@ Users= get_user_model()
 old_user_cache = {}
 
 
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+
 #  to notify after postaddition
 @receiver (post_save, sender= Post)
-def notifySuperuserAfterPostAdd(sender, instance, created , **kwargs):
+@receiver(post_save, sender= Category)
+def notifySuperuserAfterAddition(sender, instance, created , **kwargs):
      if created: 
-        users= Users.objects.filter(is_superuser=True)
+        if sender == Post:
+            users= Users.objects.filter(is_superuser=True)
 
-        for admin in users:
-            Notification.objects.create(
-            user=admin,
-            message=f"New post '{instance.title}' was created by {instance.author}"
-            )
+            for admin in users:
+                Notification.objects.create(
+                user=admin,
+                message=f"New post '{instance.title}' was created by {instance.author}",
+                model_name="post.Post",
+                model_id=instance.pk
+                )
+
+#  fro category addition
+        elif sender == Category:
+            users= Users.objects.filter(Q (is_superuser=True) | Q(is_staff=True))
+
+                     
+            for admin in users:
+                Notification.objects.create(
+                user=admin,
+                message=f"New category {instance.name} was added ",
+                model_name= "post.category",
+                model_id=instance.id
+                )
 
 
 #  to notify after postdeletion
 
-@receiver(post_delete, sender=Post)
-def notifySuperuserAfterPostDelete(sender, instance, **kwargs):
+# @receiver(post_delete, sender=Post)
 
-    superusers= Users.objects.filter(is_superuser=True)
+# def notifySuperuserAfterPostDelete(sender, instance, **kwargs):
 
-    for admin in superusers:
-     Notification.objects.create(
-        user=admin,
-        message=f" Post '{instance.title}' is deleted by {instance.author}"
-     )
+#     superusers= Users.objects.filter(is_superuser=True)
+
+#     for admin in superusers:
+#      Notification.objects.create(
+#         user=admin,
+#         message=f" Post '{instance.title}' is deleted by {instance.author}"
+#      )
 
 
-    if instance.author not in superusers:
-         Notification.objects.create(
-            user=instance.author,
-            message=f"Your post '{instance.title}' has been deleted"
-        )
+#     if instance.author not in superusers:
+#          Notification.objects.create(
+#             user=instance.author,
+#             message=f"Your post '{instance.title}' has been deleted"
+#         )
          
 
 # yesma mildaina cuz yesle poet koa uthor ko access didiaina aahile change gareko user matra dekhauxa 
@@ -70,18 +91,22 @@ def notifySuperuserAfterPostDelete(sender, instance, **kwargs):
 
 
 #  to notify after categoryadd
-@receiver(post_save, sender= Category)
-def notifyAfterCategoryAdd(sender, instance, created, *args, **kwargs):
-    if created:
+# @receiver(post_save, sender= Category)
+# def notifyAfterCategoryAdd(sender, instance, created, *args, **kwargs):
+#     if created:
 
-        users= Users.objects.filter(Q (is_superuser=True) | Q(is_staff=True))
+#         users= Users.objects.filter(Q (is_superuser=True) | Q(is_staff=True))
 
-        for admin in users:
-            Notification.objects.create(
-                user=admin,
-                message=f"New category {instance.name} was added "
+#         for admin in users:
+#             Notification.objects.create(
+#                 user=admin,
+#                 message=f"New category {instance.name} was added ",
+#                 model_name= "post.category",
+#                 model_id=instance.id
+#             )
 
-            )
+#             print('notificato',Notification)
+
 
 
 #  to notify after category update
@@ -89,29 +114,76 @@ def notifyAfterCategoryAdd(sender, instance, created, *args, **kwargs):
 def notifyAfterCategoryUpdate(sender, instance, created, *args, **kwargs):
     if not created:
          
-         users= Users.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
+        users= Users.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
 
-         for admin in users:
+        for admin in users:
             Notification.objects.create(
                 user=admin,
-                message=f"Category {instance.name} was updated "
+                message=f"Category {instance.name} was updated ",
+                model_name="post.category",
+                model_id=instance.id,
             )
+        print('instance',instance)
+
 
 
 
 #  to notify after categorydelete
 @receiver(post_delete, sender= Category)
-def notifyAfterCategoryDelete(sender, instance, *args, **kwargs):
-
+@receiver(post_delete, sender=User)
+@receiver(post_delete, sender= Post)
+def notifyAfterDelete(sender, instance, *args, **kwargs):
+    if sender == Category:
+         
          users= Users.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
 
          for admin in users:
             Notification.objects.create(
                 user=admin,
-                message=f"Category {instance.name} was deleted "
+                message=f"Category {instance.name} was deleted ",
+                model_name="post.category",
+                model_id=instance.id
+            )
+            print('instance',instance)
 
+    elif sender == User:
+
+        users= Users.objects.filter(is_superuser=True)
+
+        for admin in users:
+            Notification.objects.create(
+                user=admin,
+                message=f"User '{instance.username}' has beeen deleted ",
+                model_name="accounts.User",
+                model_id=instance.id
             )
 
+
+    elif sender == Post:
+        superusers= Users.objects.filter(is_superuser=True)
+
+        for admin in superusers:
+            Notification.objects.create(
+                user=admin,
+                message=f" Post '{instance.title}' is deleted by {instance.author}",
+                model_name="post.Post",
+                model_id=instance.id
+            )
+
+
+            if instance.author not in superusers:
+                Notification.objects.create(
+                    user=instance.author,
+                    message=f"Your post '{instance.title}' has been deleted", 
+                    model_name="post.Post",
+                    model_id=instance.id
+                )
+
+
+
+
+
+   
 
 
 #  to notify after commentsaddition
@@ -126,14 +198,20 @@ def notifyAfterCommentsAdd(sender, instance, created, *args, **kwargs):
             for admin in users:
                 Notification.objects.create(
                     user=admin,
-                    message=f"Comment '{instance.content}' was added by '{instance.author}' in '{posts.title}' "
+                    message=f"Comment '{instance.content}' was added by '{instance.author}' in '{posts.title}' ",
+                    model_name="post.Comment",
+                    model_id=instance.id
                 )
 
-
-            Notification.objects.create(
-            user=posts.author,
-            message=f"Comment '{instance.content}' was added by '{instance.author}' in '{posts.title}' "
-            )
+            #  to notify author of the post
+            if posts.author not in users:
+                Notification.objects.create(
+                    user=posts.author,
+                    message=f"Comment '{instance.content}' was added by '{instance.author}' in '{posts.title}' ",
+                    model_name="post.Comment",
+                    model_id=instance.id
+                )
+         
          
 
 
@@ -170,7 +248,9 @@ def noftifyAfterUserAdd(sender,instance,created, *args, **kwargs):
        for admin in users:
            Notification.objects.create(
                user=admin,
-               message=f"New user '{instance.username}' has been created "
+               message=f"New user '{instance.username}' has been created ",
+               model_name="accounts.User",
+               model_id=instance.id
            )
 
 
@@ -235,15 +315,15 @@ def noftifyAfterUserAdd(sender,instance,created, *args, **kwargs):
 
 
 
-@receiver(post_delete, sender=User)
-def notifyAfterUserDelete(sender, instance, *args, **kwargs):
+# @receiver(post_delete, sender=User)
+# def notifyAfterUserDelete(sender, instance, *args, **kwargs):
 
-    users= Users.objects.filter(is_superuser=True)
-    for admin in users:
-        Notification.objects.create(
-            user=admin,
-            message=f"User '{instance.username}' has beeen deleted "
-        )
+#     users= Users.objects.filter(is_superuser=True)
+#     for admin in users:
+#         Notification.objects.create(
+#             user=admin,
+#             message=f"User '{instance.username}' has beeen deleted "
+#         )
 
 
 from django.urls import reverse
@@ -259,4 +339,6 @@ def notifyAfterContactFormSubmission(sender, created, instance, *args, **kwargs)
             Notification.objects.create(
                 user=admin,
                 message=f"New Contact request  sent by '{instance.name}' ",
+                model_name="post.Contact",
+                model_id=instance.id
             )

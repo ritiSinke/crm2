@@ -31,6 +31,7 @@ urlpatterns=[
     path('post-post-details/<int:pk>/',views.AdminPostDetailsView.as_view() , name='admin_post_details'),
     path('search/',views.SearchPostView.as_view(), name='search'),
     path ('mark-as-read/',views.MarkAllNorificationRead.as_view(), name='mark_all_read'),
+    path ('notification-details/<int:pk>/redirect/',views.notificationDetailView, name='notification_details'),
 
 
 ] + static( settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,30 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+<div class="card m-3">
+        <div class="card-body">
+
+   
+      <h5 class="card-header"> User Detailsof {{user.username}} </h5>
+
+      <h6 class="mt-1"> Username
+        <br>
+         {{ users.username }}
+      </h6>  
+
+      <br>
+
+      <h6>Email: {{ users.email }}</h6>
+      <br>
+
+      <h6> Last Login: {{users.last_login|date:"Y-m-d "}}</h6>
+      <br>
+
+      <h6> Date Joined: {{ users.date_joined|date:"Y-m-d " }}</h6>
+      <br>
+
+      <h6 >Staff: {{ users.is_staff }} </h6>     `
+</div>
+</div>
+    
+{% endblock content %}

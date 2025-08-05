@@ -87,11 +87,14 @@
                                 </div>
                                 <div class="flex-grow-1 overflow-hidden">
                                     <p class="mb-1">Post</p>
-                                    <h5 class="mb-3">{{ posts }}</h5>
-                                    {% if request.user.is_superuser %}
+                                    {% if request.user.is_superuser and request.user.is_staff %}
+                                        <h5 class="mb-3">{{ posts }}</h5>
                                         <p class="text-truncate mb-0"><span class="text-success me-2"> <a href="{% url 'admin_post'%}" >More info >> </a></span> </p>
-                                    {% comment %} {% else %}
-                                        <p class="text-truncate mb-0"><span class="text-success me-2"> <a href="{% url 'my_post'%}" >More info >> </a></span> </p> {% endcomment %}
+                                    {% elif request.user.is_staff %}
+
+                                         <h5 class="mb-3">{{author_posts}}</h5>
+                                         <p class="text-truncate mb-0"><span class="text-success me-2"> <a href="{% url 'my_post'%}" >More info >> </a></span> </p>
+
                                     {% endif %}
                                 </div>
                             </div>                                        
@@ -116,8 +119,11 @@
                                 <div class="flex-grow-1 overflow-hidden">
                                     <p class="mb-1">Category</p>
                                     <h5 class="mb-3">{{ categories }}</h5>
-                                    {% if request.user.is_superuser %}
-                                    <p class="text-truncate mb-0"><span class="text-success me-2"> <a href="{% url 'category_list'%}" >More info >> </a></span> </p>
+                                    {% if request.user.is_superuser and request.user.is_staff %}
+                                     <p class="text-truncate mb-0"><span class="text-success me-2"> <a href="{% url 'category_list'%}" >More info >> </a></span> </p>
+                                     {%else%}
+                                        <p class="text-truncate mb-0"><span class="text-success me-2"> <a href="{% url 'category_list'%}" >More info >> </a></span> </p>
+
                                     {% endif %}
                                 </div>
                             </div>

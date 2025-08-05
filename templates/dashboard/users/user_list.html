@@ -40,7 +40,6 @@
           <tr>
             <th> SN </th>
             <th>User</th>
-            <th>Date</th>
             <th>Email</th>
             <th>Author </th>
             <th>Action</th>
@@ -53,11 +52,13 @@
            
                 <td> {{forloop.counter}}</td>
                 <td> {{user.username}}</td>
-                <td> {{user.date_joined}}</td>
                 <td> {{user.email}}</td>
                 <td><span class="tag tag-success">{{user.is_staff}}</span></td>
                 <td>
                     <div class="d-flex gap-2 align-items-center">
+
+                        <a href="{% url 'user_details' user.id %}" class="btn btn-secondary" >View</a>
+
                         <a href="{% url 'user_status_update'  user.id %}" class="btn btn-primary">Edit</a>
                         <form method="post" action="{% url 'delete_user' user.id%}" class="m-0 p-0">
                           {% csrf_token %}
