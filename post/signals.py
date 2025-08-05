@@ -33,7 +33,7 @@ def notifySuperuserAfterAddition(sender, instance, created , **kwargs):
                 model_id=instance.pk
                 )
 
-#  fro category addition
+        #  from category addition
         elif sender == Category:
             users= Users.objects.filter(Q (is_superuser=True) | Q(is_staff=True))
 
@@ -46,6 +46,7 @@ def notifySuperuserAfterAddition(sender, instance, created , **kwargs):
                 model_id=instance.id
                 )
 
+    #  for the user addition 
         elif sender == User:
             users=Users.objects.filter(is_superuser=True)
 
@@ -57,6 +58,7 @@ def notifySuperuserAfterAddition(sender, instance, created , **kwargs):
                     model_id=instance.id
                 )
 
+#  for the contactform submission 
         elif sender == Contact:
             users=User.objects.filter(is_superuser=True)
 
@@ -94,20 +96,28 @@ def notifySuperuserAfterAddition(sender, instance, created , **kwargs):
 
 
 #  to notify after category update
-@receiver(post_save, sender= Category)
-def notifyAfterCategoryUpdate(sender, instance, created, *args, **kwargs):
-    if not created:
-         
-        users= Users.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
+@receiver(pre_save, sender= Category)
+def notifyAfterCategoryUpdate(sender, instance, *args, **kwargs):
+    if not instance.pk:
+        return 
+    
+    try:
+        old_instance = Category.objects.get(pk=instance.pk)
+    except Category.DoesNotExist:   
+        return  # Just in case      
+    
 
-        for admin in users:
-            Notification.objects.create(
-                user=admin,
-                message=f"Category {instance.name} was updated ",
-                model_name="post.category",
-                model_id=instance.id,
-            )
-        print('instance',instance)
+    if old_instance.name != instance.name:
+        users = Users.objects.filter(Q(is_superuser=True) | Q(is_staff=True))
+         
+    for admin in users:
+        Notification.objects.create(
+            user=admin,
+            message=f"Category '{instance.name}' was updated ",
+            model_name="post.category",
+            model_id=instance.id,
+        )
+    print('instance',instance)
 
 
 
@@ -132,7 +142,7 @@ def notify_before_comment_update(sender, instance, **kwargs):
         for admin in superusers:
             Notification.objects.create(
                 user=admin,
-                message=f"Comment {instance.content} was updated by '{instance.author}' in '{post.title}'",
+                message=f"Comment '{instance.content}' was updated by '{instance.author}' in '{post.title}'",
                 model_name="post.Comment",
                 model_id=instance.id
             )
