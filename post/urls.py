@@ -46,6 +46,8 @@ urlpatterns=[
     path('search-mypost/', views.SearchAuthorPostView.as_view(), name='search_mypost'),
 
 
+    # path('delete-comments<int:pk>/', views.softDeleteCommentByUser, name='delete_comment_by_user'),
+
 
 ] + static( settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

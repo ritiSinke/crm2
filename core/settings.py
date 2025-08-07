@@ -70,7 +70,12 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'post.context_processors.notificationsView',
-                'post.context_processors.is_author',
+                # 'post.context_processors.is_author',
+                'post.context_processors.time',
+                'post.context_processors.getcategories',
+                'post.context_processors.popular_posts',
+                'post.context_processors.getFooterpost',
+
             ],
         },
     },

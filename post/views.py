@@ -321,14 +321,15 @@ def post_likes(request, pk):
     return JsonResponse({'likes': likes})
 
 
-# show all t post from db is the post is not draft 
+from django.db.models import Count
+
+# show all trending  post from db is the post is not draft 
 def all_posts(request):
     is_author = False
 
     if request.user.is_authenticated:
         is_author = request.user.groups.filter(name='author').exists()
 
-    from django.db.models import Count
     posts = Post.objects.filter(is_draft=False).order_by('-date_posted')
     categories = Category.objects.all()
     posts = posts.annotate(comment_count=Count('comments'))
@@ -345,9 +346,6 @@ def all_posts(request):
     })
 
 
-
-
-   
 
 
 # searching posts 
@@ -685,11 +683,12 @@ class SearchCommentsView(ListView):
 
             return queryset
         
-        def get_context_data(self, **kwargs) -> dict[str, Any]:
+        def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             context['search_result'] = self.request.GET.get('search', '').strip()
+            
             return context
-        
+            
 
 
 from .models import Contact
@@ -753,3 +752,19 @@ class SearchAuthorPostView(ListView):
         context = super().get_context_data(**kwargs)
         context['search_result'] = self.request.GET.get('search', '').strip()
         return context
+    
+# @login_required
+
+# def softDeleteCommentByUser(request,pk):
+    
+#     comment=Comment.objects.get(id=pk)
+#     context= { 'comments': comment}
+
+#     if request.method == 'POST':
+#         comment.is_delete=True
+#         comment.save()
+#         messages.success(request,'Comment deleted successfully')
+#         return redirect('admin_comment_list')
+    
+    
+#     return render(request,'dashboard/comments/delete_comments.html', context)
