@@ -92,6 +92,10 @@
                                     <input type="hidden" name="parent_id" value="{{ comment.id }}">
                                     <button class="btn btn-primary btn-sm" type="submit">Add Reply</button>
                                 </form>
+
+                                {% if request.user == comment.author %}
+                                    <a href="{% url 'edit_comment' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Delete  </button> </a>
+                                {% endif %}
                             {% endif %}
 
                             {% for reply in comment.replies.all %}
@@ -100,6 +104,10 @@
                                     {{ reply.content }}
                                       {% if request.user == comment.author %}
                                     <a href="{% url 'edit_comment' reply.id %}"/> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+                                {% endif %}
+
+                                {% if request.user == comment.author %}
+                                    <a href="{% url 'edit_comment' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Delete  </button> </a>
                                 {% endif %}
                                 </div>
                               
