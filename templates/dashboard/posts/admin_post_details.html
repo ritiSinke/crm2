@@ -81,7 +81,7 @@
                             {{ comment.content }}
 
                             {% if user.is_authenticated %}
-                                {% if user.is_superuser %}
+                                {% if request.user == comment.author %}
                                     <a href="{% url 'edit_comment' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
                                 {% endif %}
 
@@ -98,7 +98,7 @@
                                 <div class="ms-3 mt-2 border-start ps-2">
                                     <strong>{{ reply.author.username }}</strong> ({{ reply.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
                                     {{ reply.content }}
-                                      {% if user.is_superuser %}
+                                      {% if request.user == comment.author %}
                                     <a href="{% url 'edit_comment' reply.id %}"/> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
                                 {% endif %}
                                 </div>

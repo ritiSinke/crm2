@@ -57,7 +57,7 @@
                 <td>
                     <div class="d-flex gap-2 align-items-center">
 
-                        <a href="{% url 'user_details' user.id %}" class="btn btn-secondary" >View</a>
+                        <a href="{% url 'user_details' user.id %}" class="btn btn-secondary" ><i class="ri-eye-line"></i></a>
 
                         <a href="{% url 'user_status_update'  user.id %}" class="btn btn-primary"><i class="ri-edit-2-line"></i></a>
                         <form method="post" action="{% url 'delete_user' user.id%}" class="m-0 p-0">

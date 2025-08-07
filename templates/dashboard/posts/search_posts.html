@@ -72,13 +72,13 @@
                     <td> {{ post.date_posted}}</td>
                     <td>
                           <div class="d-flex gap-2 align-items-center">
-                              <a href="{% url 'admin_post_details' post.pk %}" class="btn btn-secondary">View</a>
-                             {% if request.user == post.author %}
+                              <a href="{% url 'admin_post_details' post.pk %}" class="btn btn-secondary"><i class="ri-eye-line"></i></a>
+                             {% if request.user == post.author  or request.user.is_superuser%}
 
-                                <a href="{% url 'update-post' post.pk %}" class="btn btn-primary">Edit</a>
+                                <a href="{% url 'update-post' post.pk %}" class="btn btn-primary"><i class="ri-edit-2-line"> </i></a>
                                 <form method="post" action="{% url 'delete-post' post.pk %}" class="m-0 p-0">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger" onclick="return confirmDeleteModal(event)">Delete</button>
+                                    <button type="submit" class="btn btn-danger" onclick="return confirmDeleteModal(event)"><i class="ri-delete-bin-line"></i></button>
                                 </form>
                                 
                           </div>

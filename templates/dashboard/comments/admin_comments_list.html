@@ -61,7 +61,7 @@
                                 <td style="border-right: 1px solid #dee2e6;">
                                     <form method="post" action="{% url 'delete_comment' comment.pk %}" class="m-0 p-0 d-inline-block w-100">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-sm w-100" onclick="return confirmDeleteModal(event)">Delete</button>
+                                        <button type="submit" class="btn btn-danger btn-sm " onclick="return confirmDeleteModal(event)"><i class="ri-delete-bin-line"></i></button>
                                     </form>
                             </td>
 

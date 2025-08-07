@@ -82,31 +82,50 @@
                 <h4 class="m-0 text-uppercase font-weight-bold ">Featured News</h4>
             </div>
            
-            <div class=" owl-carousel featured-carousel carousel-item-4  position-relative">
-                
-                {% for post in posts %}
+            <div style="position: relative; width: 100%;">
+    <!-- Left arrow -->
+    <button onclick="scrollCarousel(-1)" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 2; background: none; border: none; font-size: 2rem;">
+        &#8249;
+    </button>
 
-                <div class="items mb-4">
-                    <div class="position-relative overflow-hidden" style="height: 200px; width: 100%;">
-                        {%  if post.image %}
-                        <img class=" h-100" src="{{post.image.url}}" style="object-fit: cover;">
-                   
-                        {% endif %}
-                        <div class="overlay text-white" style=" position:absolute; bottom:0; left:0; width:100%; padding:20px;">
-                            <div class="mb-2">
-                                <a class="badge badge-primary text-white text-uppercase text-black font-weight-semi-bold p-2 mr-2"
-                                href="#">{{ post.category }}</a>
-                                | {{ post.date_posted|date:"M d, Y" }}
-                            </div>
-                            <a class="h6 m-0 text-uppercase font-weight-semi-bold"
-                            href="{% url 'post-details' post.pk %}">
-                                {{ post.title|truncatechars:40 }}
-                            </a>
-                        </div>
-                    </div> 
+    <!-- Carousel Container -->
+    <div id="carousel" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 16px; padding: 10px 40px; scrollbar-width: none;">
+        {% for post in posts %}
+        <div class="items mb-4" style="flex: 0 0 auto; width: 300px;">
+            <div class="position-relative overflow-hidden" style="height: 200px; width: 100%;">
+                {% if post.image %}
+                <img class="h-100" src="{{ post.image.url }}" style="object-fit: cover; width: 100%; height: 100%;">
+                {% endif %}
+                <div class="overlay text-white" style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: rgba(0, 0, 0, 0.5);">
+                    <div class="mb-2">
+                        <a class="badge badge-primary text-white text-uppercase text-black font-weight-semi-bold p-2 mr-2" href="#">
+                            {{ post.category }}
+                        </a>
+                        | {{ post.date_posted|date:"M d, Y" }}
+                    </div>
+                    <a class="h6 m-0 text-uppercase font-weight-semi-bold text-white" href="{% url 'post-details' post.pk %}">
+                        {{ post.title|truncatechars:40 }}
+                    </a>
                 </div>
-            {% endfor %}
             </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Right arrow -->
+    <button onclick="scrollCarousel(1)" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 2; background: none; border: none; font-size: 2rem;">
+        &#8250;
+    </button>
+</div>
+
+<script>
+    function scrollCarousel(direction) {
+        const carousel = document.getElementById('carousel');
+        const scrollAmount = 320;  // Adjust this to match card width + gap
+        carousel.scrollLeft += direction * scrollAmount;
+    }
+</script>
+
         </div>
     </div>
 

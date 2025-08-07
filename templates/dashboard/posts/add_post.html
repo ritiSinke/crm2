@@ -1,21 +1,6 @@
 {% extends 'dashboard/base_admin.html' %}
 
 
-{% block search_content %}
-<form class="app-search d-none d-lg-block" method = "get"  action = "{% url 'search'%}">
-
-    <div class="row">
-      <div class="col">
-        <input class="form-control mr-sm-2" type="search" {% if search_result %} value="{{ search_result }}" {% endif %} placeholder="Search" aria-label="Search" name="search">
-    </div>
-    <div class="col p-0">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fas fa-search"></i></button>
-    </div> 
-    
-    </div>             
-</form>   
-
-{% endblock search_content %}
 
 {% block content %}
 <div class="card m-3">
