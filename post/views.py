@@ -624,3 +624,132 @@ class EditCommentUserView(LoginRequiredMixin, UpdateView):
 
         return super().form_valid(form)
     
+
+
+class SearchCategoryView(ListView):
+
+    model=Category
+    template_name= 'dashboard/category/search_category.html'
+    context_object_name= 'categories'
+
+    def get_queryset(self):
+        queryset = Category.objects.all()
+        search_query = self.request.GET.get('search', '').strip()
+        content_type = self.request.GET.get('content_type', '').strip()
+
+        if search_query:
+            queryset = queryset.filter(name__icontains=search_query)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_result'] = self.request.GET.get('search', '').strip()
+        
+        return context
+    
+
+class SearchUserView(ListView):
+    model=User
+    template_name='dashboard/users/search_users.html'
+    context_object_name='users'
+
+    def get_queryset(self):
+        queryset = User.objects.all()
+        search_query = self.request.GET.get('search', '').strip()
+
+        if search_query:
+            queryset = queryset.filter(username__icontains=search_query)
+
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_result'] = self.request.GET.get('search', '').strip()
+        
+        return context
+    
+
+
+class SearchCommentsView(ListView):
+    model= Comment
+    template_name='dashboard/comments/search_comments.html'
+    context_object_name='comments'
+
+    def get_queryset(self):
+        queryset=Comment.objects.all()
+        search_query = self.request.GET.get('search', '').strip()
+
+        if search_query:
+            queryset = queryset.filter(content__icontains=search_query)
+
+            return queryset
+        
+        def get_context_data(self, **kwargs) -> dict[str, Any]:
+            context = super().get_context_data(**kwargs)
+            context['search_result'] = self.request.GET.get('search', '').strip()
+            return context
+        
+
+
+from .models import Contact
+class SearchContactView(ListView):
+    model= Contact
+    template_name='dashboard/contact/search_contact.html'
+    context_object_name= 'contacts'
+
+    def get_queryset(self):
+        queryset=Contact.objects.all()
+        search_query=self.request.GET.get('search', '').strip()
+
+        if search_query:
+            queryset= queryset.filter(name__icontains=search_query) | queryset.filter(email__icontains=search_query)
+
+            return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_result'] = self.request.GET.get('search', '').strip()
+        return context
+
+
+
+
+class SearchAuthorView(ListView):
+    model = User
+    template_name = 'dashboard/users/search_author.html'
+    context_object_name = 'authors'
+
+    def get_queryset(self):
+        queryset = User.objects.filter(is_staff=True)
+        search_query = self.request.GET.get('search', '').strip()
+
+        if search_query:
+            queryset = queryset.filter(username__icontains=search_query)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_result'] = self.request.GET.get('search', '').strip()
+        return context
+        
+
+class SearchAuthorPostView(ListView):
+    model = Post
+    template_name = 'dashboard/posts/search_mypost.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        queryset = Post.objects.filter(author=self.request.user)
+        search_query = self.request.GET.get('search', '').strip()
+
+        if search_query:
+            queryset = queryset.filter(title__icontains=search_query)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_result'] = self.request.GET.get('search', '').strip()
+        return context

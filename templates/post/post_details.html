@@ -66,6 +66,8 @@
                             {{ comment.content }}
                             {% if request.user == comment.author%}
                                 <a href="{% url 'edit_comment_users' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+                                <a href="{% url 'edit_comment_users' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Delete  </button> </a>
+
                             {% endif %} 
 
                             {% if user.is_authenticated %}
@@ -84,6 +86,8 @@
                                     {{ reply.content }}
                                     {% if comment.author == request.user%}
                                         <a href="{% url 'edit_comment_users' reply.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+                                        <a href="{% url 'edit_comment_users' reply.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+
                                     {% endif %}
                                 </div>
                             {% endfor %}
