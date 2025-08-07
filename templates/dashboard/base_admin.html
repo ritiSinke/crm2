@@ -16,6 +16,8 @@
     <!-- App CSS -->
     <link href="{% static 'dist/assets/css/app.min.css' %}" id="app-style" rel="stylesheet" type="text/css" />
     
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet" />
+    
     {% block css %}{% endblock css %}
 
 </head>
@@ -57,6 +59,8 @@
                             <i class="ri-menu-2-line align-middle"></i>
                         </button>
 
+                        
+
                         <!-- App Search-->
                         {% block search_content %}
                     
@@ -65,8 +69,13 @@
 
                     <div class="d-flex">
 
-                        
-                        
+                       <div class="theme-toggle">
+                            <label class="switch">
+                                <input type="checkbox" id="themeToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
                         <div class="dropdown d-none d-lg-inline-block ms-1">
                             <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
                                 <i class="ri-fullscreen-line"></i>
@@ -150,11 +159,12 @@
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="ri-shut-down-line align-middle me-1 text-danger"></i> Logout</a>
                             </div>
+
+                            
+                            
                         </div>
+     
 
-        
-
-                    </div>
                 </div>
             </header>
 
@@ -342,9 +352,7 @@
     
             return true;
         }
-      </script>
-
-    <script>
+  
         document.addEventListener('DOMContentLoaded', function () {
             const bell = document.getElementById('page-header-notifications-dropdown');
             const dot = document.getElementById('notification-dot');
@@ -367,6 +375,28 @@
                 });
             });
         });
+
+ const toggle = document.getElementById('themeToggle');
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('darkmode');
+      toggle.checked = true;
+    }
+  });
+
+  toggle.addEventListener('change', () => {
+    if (toggle.checked) {
+      document.body.classList.add('darkmode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('darkmode');
+      localStorage.setItem('theme', 'light');
+    }
+  });
+
+
     </script>
 
 
