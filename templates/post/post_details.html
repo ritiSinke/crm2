@@ -61,7 +61,7 @@
                     <h5>Comments</h5>
                     {% for comment in comments %}
                         <div class="mb-2">
-                            
+
                             <strong>{{ comment.author.username }}</strong> ({{ comment.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
                             {{ comment.content }}
                             {% if request.user == comment.author%}
@@ -86,7 +86,7 @@
                                     {{ reply.content }}
                                     {% if comment.author == request.user%}
                                         <a href="{% url 'edit_comment_users' reply.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
-                                        <a href="{% url 'edit_comment_users' reply.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+                                        <a href="{% url 'edit_comment_users' reply.id %}" /> <button class="btn btn-link btn-sm p-0">  Delete  </button> </a>
 
                                     {% endif %}
                                 </div>
