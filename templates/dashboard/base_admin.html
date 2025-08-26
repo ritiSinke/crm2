@@ -199,6 +199,33 @@
                                     <li><a href="email-read.html">Add User</a></li>
                                 </ul>
                             </li> {% endcomment %}
+
+                            
+                            {%  if request.user.is_superuser%}
+                            <li>
+                                <a href="#" class="has-arrow waves-effect">
+                                {% comment %} <i class="mdi mdi-account-cog"></i> {% endcomment %}
+                                <i class="ri-bubble-chart-line"></i>
+                               <span> Sort By </span>
+                                </a>
+                                <div id="category-list-container"
+                                    style="display:none; position:fixed; left:220px; top:80px; width:250px; z-index:1000; background:#fff; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow-y:auto; max-height:400px;">
+                                </div>   
+
+                                <div id="author-list-container" 
+                                    style="display:none; position:fixed; left:220px; top:90px; width:250px; z-index:1000; background:#fff; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow-y:auto; max-height:400px;">
+                               </div>
+
+                                    <ul class="sub-menu" aria-expanded="false">
+                                    <li> <a href="#" data-sort-category> Catgeory</a> </li>
+                                    <li> <a href="#" data-sort-author> Author </a> </li>
+
+                                    <li> <a href="{% url 'post_sorted_list' %}"> Date Posted </a> </li>
+                                    
+                                </ul>
+                            </li>
+                            {% endif %}
+
                             {%  if request.user.is_superuser%}
                             <li>
                                 <a href="#" class="has-arrow waves-effect">
@@ -212,6 +239,10 @@
                             </li>
                             {% endif %}
 
+
+
+
+                            
                             <li>
                                 <a href="#" class="has-arrow waves-effect">
                                 <i class="ri-file-list-3-fill"></i>        
@@ -221,7 +252,9 @@
                                     <li><a href="{% url 'add-post' %}">Create Post</a></li>
                                     {% if request.user.is_superuser %}
 
-                                    <li><a href="{% url 'admin_post' %}">List Post</a></li>
+                                    <li><a href="{% url 'admin_post' %}">Draft Post</a></li>
+
+                                    <li> <a href="{% url 'admin_published_posts'%}"> Published Post</a> </li>
                                     {% else %}
 
                                     <li><a href="{% url 'my_post' %}">List Post</a></li>
@@ -395,6 +428,78 @@
       localStorage.setItem('theme', 'light');
     }
   });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const categoryLink = document.querySelector('[data-sort-category]');
+        const categoryListContainer = document.getElementById('category-list-container');
+    
+        if (categoryLink) {
+            categoryLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (categoryListContainer.style.display === 'block') {
+                    categoryListContainer.style.display = 'none';
+                    categoryListContainer.innerHTML = '';
+                } else {
+                    fetch("{% url 'ajax_category_list' %}")
+                        .then(response =>response.json())
+                        .then(data => {
+                            categoryListContainer.innerHTML = data.html;
+                            categoryListContainer.style.display = 'block';
+                        });
+                }
+            });
+        }
+    
+        // Hide when clicking outside
+        document.addEventListener('click', function (e) {
+            if (
+                categoryListContainer.style.display === 'block' &&
+                !categoryListContainer.contains(e.target) &&
+                e.target !== categoryLink
+            ) {
+                categoryListContainer.style.display = 'none';
+                categoryListContainer.innerHTML = '';
+            }
+        });
+    });
+
+    
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const authorLink = document.querySelector('[data-sort-author]');
+        const authorListContainer = document.getElementById('author-list-container');
+
+        if (authorLink) {
+            authorLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (authorListContainer.style.display === 'block') {
+                    authorListContainer.style.display = 'none';
+                    authorListContainer.innerHTML = '';
+                } else {
+                    fetch("{% url 'author_list_sidebar' %}")
+                        .then(response => response.json())
+                        .then(data => {
+                            authorListContainer.innerHTML = data.html;
+                            authorListContainer.style.display = 'block';
+                        });
+                }
+            });
+        }
+        // Hide when clicking outside
+        document.addEventListener('click', function (e) {
+            if (
+                authorListContainer.style.display === 'block' &&
+                !authorListContainer.contains(e.target) &&
+                e.target !== authorLink
+            ) {
+                authorListContainer.style.display = 'none';
+                authorListContainer.innerHTML = '';
+            }
+        });
+});
+
+
 
 
     </script>

@@ -1,0 +1,11 @@
+
+
+<ul class="list-group">
+    {% for author in authors %}
+        <li class="list-group-item">
+            <a href="{% url 'author_post_admin' author.pk %}" class="category-link">{{ author.username }}</a>
+        </li>
+    {% empty %}
+        <li class="list-group-item text-muted">No author found.</li>
+    {% endfor %}
+</ul>

@@ -211,3 +211,70 @@ class NotificationView(ListView, StaffOrSuperuserRequiredMixin):
     def get_queryset(self):
           return Notification.objects.filter(user=self.request.user).order_by('-created_at')
     
+
+
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+# for admin ko sorting 
+class AjaxCategoryListView( SuperUserRequiredMixin,ListView):
+    model = Category
+    template_name = 'dashboard/category/partial_category_list.html'
+    context_object_name = 'categories'
+
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        html = render_to_string(self.template_name, {self.context_object_name: self.object_list})
+        return JsonResponse({'html': html})
+    
+
+
+class AjaxAuthorListView( SuperUserRequiredMixin, ListView):
+    model=User
+    template_name='dashboard/users/author_partial_list.html'
+    context_object_name='authors'
+
+    def get_queryset(self):
+        return self.model.objects.filter(is_staff=True)
+
+    def get(self, request, *args, **kwargs):    
+        self.object_list = self.get_queryset()
+        print("Author List:")
+        for author in self.object_list:
+            print(f"Username: {author.username}, Email: {author.email}")
+        html= render_to_string(self.template_name, {self.context_object_name: self.object_list})
+        return JsonResponse({'html': html})
+    
+    
+
+
+from django.contrib.auth import get_user_model
+class AuthorPostAdminView(SuperUserRequiredMixin, ListView):
+        template_name = 'dashboard/users/author_posts.html'
+        queryset=User.objects.filter(is_staff=True)
+        context_object_name= 'posts'
+        paginate_by=10
+
+        def get_queryset(self):
+            author_pk=self.kwargs.get('pk')
+            author=get_object_or_404(get_user_model(), pk=author_pk)
+            return Post.objects.filter(author=author).order_by('date_posted')
+    
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['author'] = get_object_or_404(User, pk=self.kwargs.get('pk'))
+            return context
+
+
+
+class AuthorPostSortedView(SuperUserRequiredMixin, ListView):
+    model=Post
+    template_name = 'dashboard/posts/sorted_posts.html'
+    context_object_name = 'posts'
+    paginate_by=10
+
+    def get_queryset(self):
+        return Post.objects.all().order_by('-date_posted')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

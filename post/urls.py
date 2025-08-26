@@ -20,8 +20,10 @@ urlpatterns=[
 
     path('contact/', views.ContactView.as_view(), name='contact'),  
     path('category/<int:pk>/', views.CategoryPostsView.as_view(), name='category-posts'),
+    path('category-post-admin/<int:pk>/', views.CatgeoryPostsAdminView.as_view(), name='category_posts_admin'),
     
-    path('admin-posts/',views.AdminPostView.as_view(),name='admin_post'),
+    path('admin-posts/',views.AdminDraftPostView.as_view(),name='admin_post'),
+    path('admin-published-posts/', views.AdminPublishedPostView.as_view(), name='admin_published_posts'),
     path('admin-comments-list/',views.CommentListView.as_view(), name='admin_comment_list'),
     # path('delete-comments/<int:pk>/', CommentUpdateView.as_view(),name='delete_comment'),
     
