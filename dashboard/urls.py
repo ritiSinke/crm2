@@ -17,5 +17,10 @@ urlpatterns =[
     path('contact-list/', views.ContactInfoView.as_view(), name='contact_info'),
     path('contact-details/<int:pk>/', views.ContactDetailsView.as_view(), name='contact_details'),
     path('all-notifications/', views.NotificationView.as_view(), name='view_all_notifications'),
-    
+
+    path('ajax/category-list/', views.AjaxCategoryListView.as_view(), name='ajax_category_list'),
+    path('ajax/author_list/', views.AjaxAuthorListView.as_view(), name='author_list_sidebar'),  
+
+    path('author-post-admin/<int:pk>/', views.AuthorPostAdminView.as_view(), name='author_post_admin'), 
+    path('post-sorted-list', views.AuthorPostSortedView.as_view(), name='post_sorted_list'),
 ]

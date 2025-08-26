@@ -418,19 +418,43 @@ class AuthorPostViewforUser(ListView):
 
 
 
-class AdminPostView(SuperUserRequiredMixin, ListView):
+#  draftPost for admin 
+class AdminDraftPostView(SuperUserRequiredMixin, ListView):
     
     template_name='dashboard/posts/list_posts.html'
     paginate_by=10  # aauta page ma kati ota post dekhauney 
 
     model=Post 
     context_object_name = 'posts'
-    queryset=Post.objects.all().order_by('-date_posted')
+    queryset=Post.objects.filter(is_draft=True).order_by('-date_posted')
 
-   
+#    published post for admin 
+class AdminPublishedPostView(SuperUserRequiredMixin, ListView):
+    template_name='dashboard/posts/published_posts.html'
+    paginate_by=10
+
+    model=Post
+    context_object_name='posts'
+    queryset=Post.objects.filter(is_draft=False).order_by('-date_posted')
 
 
 
+class CatgeoryPostsAdminView(SuperUserRequiredMixin, ListView):
+    model=Post
+    template_name='dashboard/category/category_posts.html'
+    context_object_name='posts'
+    paginate_by=10
+
+    def get_queryset(self):
+        category_pk=self.kwargs.get('pk')
+        category=get_object_or_404(Category, pk=category_pk)
+        return Post.objects.filter(category=category).order_by('-date_posted') 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = get_object_or_404(Category, pk=self.kwargs.get('pk'))
+        return context 
+    
 class CommentListView(SuperUserRequiredMixin, ListView):
     template_name='dashboard/comments/admin_comments_list.html'
     model=Comment

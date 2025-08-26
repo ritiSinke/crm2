@@ -1,0 +1,11 @@
+
+
+<ul class="list-group">
+    {% for category in categories %}
+        <li class="list-group-item">
+            <a href="{% url 'category_posts_admin' category.pk %}" class="category-link">{{ category.name }}</a>
+        </li>
+    {% empty %}
+        <li class="list-group-item text-muted">No categories found.</li>
+    {% endfor %}
+</ul>
