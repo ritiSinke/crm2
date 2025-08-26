@@ -49,7 +49,13 @@ class PostLike(models.Model):
     def get_absolute_url(self):
         return reverse('admin_post_details', kwargs={"pk": self.pk})
 
+class PostDislike(models.Model):
+    reader= models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    dislike_count = models.PositiveIntegerField(null=True, editable=True, default=0)
 
+    def get_absolute_url(self):
+        return reverse('admin_post_details', kwargs={"pk": self.pk})
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name='comments')

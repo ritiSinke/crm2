@@ -34,13 +34,13 @@
                     
                     <div class="bg-white border border-top-0 p-4">
                         <div class="mb-3">
-                            <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
+                            <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2 text-dark"
                                 href="#">{{ post.category.name }}</a>
                             <a class="text-body" href="">{{ post.date_posted|date:"M d, Y" }}</a>
                         </div>
                         <h1 class="mb-3 text-secondary text-uppercase font-weight-bold">{{ post.title }}</h1>
                         
-                        <p>{{ post.content|linebreaks }}</p>
+                        <p class="text-dark">{{ post.content|linebreaksbr }}</p>
                     </div>
                     
                     <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
@@ -54,6 +54,7 @@
 
                 <!-- Likes Section -->
                 <div class="mb-3">
+
                     <a href="{% url 'like-post' post.pk %}" class="btn btn-primary btn-sm">Like Post</a>
 
                     <span class="ms-2 position-relative d-inline-block" style="cursor: pointer;" id="likes-container">
@@ -69,9 +70,16 @@
                             white-space: nowrap;">
                             Loading...
                         </div>
+
+                        <a href="{% url 'like-post' post.pk %}" class="btn btn-primary btn-sm">Dislike Post</a>
+
+                    <span class="ms-2 position-relative d-inline-block" style="cursor: pointer;" id="likes-container">
+                        <span id="likes-count">( {{ like_count }} Likes)</span>
                     </span>
                 </div>
 
+
+                    
                 <!-- Comments Section -->
                 <div>
                     <h5>Comments</h5>
