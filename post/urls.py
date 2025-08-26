@@ -31,17 +31,20 @@ urlpatterns=[
     path('post-post-details/<int:pk>/',views.AdminPostDetailsView.as_view() , name='admin_post_details'),
     path ('mark-as-read/',views.MarkAllNorificationRead.as_view(), name='mark_all_read'),
     path ('notification-details/<int:pk>/redirect/',views.notificationDetailView, name='notification_details'),
+
+    # comment related urlss
     path('edit-comment/<int:pk>/', views.EditCommentView.as_view(), name='edit_comment'),
     path('edit_comment-users/<int:pk>/', views.EditCommentUserView.as_view(), name='edit_comment_users'),
-
-
+    path('delete-comment/<int:pk>/', views.DeleteCommentUserView.as_view(), name='delete_comment'),
+    # path('delete-reply-comment/<int:pk>/', views.DeleteReplyCommentUserView.as_view(), name='delete_reply_comment'),
+    # path('reply-comment/<int:pk>/', views.ReplyCommentView.as_view(), name='reply_comment'),
     # searching urlsss
 
     path('search/',views.SearchPostView.as_view(), name='search'),
     path('search_category/', views.SearchCategoryView.as_view(), name='search_category'),
     path('serach-user/', views.SearchUserView.as_view(), name='search_user'),
     path('search-comments/', views.SearchCommentsView.as_view(), name='serach_comments'),
-    path('search-contact/', views.SearchContactView.as_view(), name='seaych_contact'),
+    path('search-contact/', views.SearchContactView.as_view(), name='search_contact'),
     path('search-author/', views.SearchAuthorView.as_view(), name='search_author'),
     path('search-mypost/', views.SearchAuthorPostView.as_view(), name='search_mypost'),
 

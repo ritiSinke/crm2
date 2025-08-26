@@ -63,33 +63,36 @@
                         <div class="mb-2">
 
                             <strong>{{ comment.author.username }}</strong> ({{ comment.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
-                            {{ comment.content }}
-                            {% if request.user == comment.author%}
-                                <a href="{% url 'edit_comment_users' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
-                                <a href="{% url 'edit_comment_users' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Delete  </button> </a>
-
-                            {% endif %} 
+                            {{ comment.content }} 
 
                             {% if user.is_authenticated %}
                                 <button class="btn btn-link btn-sm p-0" type="button" onclick="toggleReplyForm({{ comment.id }})">Reply</button>
+                                {% if request.user == comment.author %}
+                                    <a href="{% url 'edit_comment_users' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
+                                    <a href="{% url 'delete_comment' comment.id %}" /> <button class="btn btn-link btn-sm p-0">  Delete  </button> </a>
+                                {% endif %}
+
                                 <form method="POST" id="reply-form-{{ comment.id }}" style="display:none; margin-top:10px;">
                                     {% csrf_token %}
                                     {{ form.as_p }}
                                     <input type="hidden" name="parent_id" value="{{ comment.id }}">
                                     <button class="btn btn-primary btn-sm" type="submit">Add Reply</button>
+                                    
                                 </form>
                             {% endif %}
 
-                            {% for reply in comment.replies.all %}
-                                <div class="ms-3 mt-2 border-start ps-2">
-                                    <strong>{{ reply.author.username }}</strong> ({{ reply.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
-                                    {{ reply.content }}
-                                    {% if comment.author == request.user%}
-                                        <a href="{% url 'edit_comment_users' reply.id %}" /> <button class="btn btn-link btn-sm p-0">  Edit  </button> </a>
-                                        <a href="{% url 'edit_comment_users' reply.id %}" /> <button class="btn btn-link btn-sm p-0">  Delete  </button> </a>
-
-                                    {% endif %}
-                                </div>
+                            {% for reply in comment.replies.all%}
+                                {% if not reply.is_delete %}
+                                    <div class="ms-3 mt-2 border-start ps-2">
+                                        <strong>{{ reply.author.username }}</strong> ({{ reply.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
+                                        {{ reply.content }}
+                                        {% if request.user == comment.author %}
+                                            <a href="{% url 'edit_comment_users' reply.id %}" /> <button class="btn btn-link bt p-0"> Edit  </button> </a>
+                                            <a href="{% url 'delete_comment' reply.id %}" /> <button class="btn btn-link btn-sm p-0">  Delete  </button> </a>
+                                        {% endif %}
+                                    
+                                    </div>
+                                {% endif %}
                             {% endfor %}
                         </div>
                     {% empty %}
