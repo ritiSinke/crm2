@@ -399,7 +399,22 @@ class CategoryPostsView(ListView):
         return context
     
 
+class AuthorPostViewforUser(ListView):
+    model=Post
+    template_name='post/author_posts.html'
+    context_object_name='posts'
 
+    def get_queryset(self):
+        author_pk=self.kwargs.get('pk')
+        author=get_object_or_404(get_user_model(), pk=author_pk)
+        return Post.objects.filter(author=author,is_draft=False).order_by('date_posted')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['author'] = get_object_or_404(User, pk=self.kwargs.get('pk'))
+        return context
+
+    
 
 
 

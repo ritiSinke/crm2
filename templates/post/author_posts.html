@@ -6,9 +6,8 @@
 
 <div class="container mt-4">
      
-    <h2>Posts in {{ category.name }}</h2>
+    <h2>Posts  for {{author}}</h2>
     
-
      <div class="container-fluid">
         <div class="container">
             <div class="row">         
@@ -32,7 +31,7 @@
                             <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
                                 <div class="d-flex align-items-center">
                                 <img class="rounded-circle header-profile-user" src="{% static 'dist/assets/images/users/avatar-2.jpg' %}"  alt="Header Avatar" style="width: 20px; height: 20px;">                                    
-                                <small>   {{post.author}}</small>
+                                <small> {{post.author}}</small>
                                 </div>
                                 <div class="d-flex align-items-center">
                                 <small class="ml-3"><i class="far fa-comment mr-2"></i> {{ post.comment_count }} comments</small>

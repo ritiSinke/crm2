@@ -40,6 +40,8 @@ urlpatterns=[
     # path('reply-comment/<int:pk>/', views.ReplyCommentView.as_view(), name='reply_comment'),
     # searching urlsss
 
+
+    path('author-post-user/<int:pk>/', views.AuthorPostViewforUser.as_view(), name='author_posts_user'),    
     path('search/',views.SearchPostView.as_view(), name='search'),
     path('search_category/', views.SearchCategoryView.as_view(), name='search_category'),
     path('serach-user/', views.SearchUserView.as_view(), name='search_user'),
