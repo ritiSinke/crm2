@@ -321,7 +321,7 @@ def post_likes(request, pk):
     return JsonResponse({'likes': likes})
 
 
-from django.db.models import Count
+from django.db.models import Count,Q
 
 # show all trending  post from db is the post is not draft 
 def all_posts(request):
@@ -332,7 +332,7 @@ def all_posts(request):
 
     posts = Post.objects.filter(is_draft=False).order_by('-date_posted')
     categories = Category.objects.all()
-    posts = posts.annotate(comment_count=Count('comments'))
+    posts = posts.annotate(comment_count=Count('comments', filter=Q(comments__is_delete=False)))
     trending_posts = Post.objects.filter(is_draft=False) \
                         .annotate(num_comments=Count('comments')) \
                         .filter(num_comments__gt=0) \
@@ -580,7 +580,7 @@ def get_model_from_string(model_string):
         return None
 
 
-
+#  this is for the superadmin to edit any comment
 from django.views.generic.edit import UpdateView
 class EditCommentView(SuperUserRequiredMixin, UpdateView ):
     model=Comment
@@ -601,8 +601,7 @@ class EditCommentView(SuperUserRequiredMixin, UpdateView ):
         return super().form_valid(form)
 
 
-
-
+#  this is for user to edit their own comment
 class EditCommentUserView(LoginRequiredMixin, UpdateView):
     model=Comment
     template_name='post/edit_comment.html'
@@ -621,7 +620,37 @@ class EditCommentUserView(LoginRequiredMixin, UpdateView):
         messages.success(self.request, 'Comment updated successfully')
 
         return super().form_valid(form)
-    
+      
+
+
+from django.views.generic.edit import DeleteView
+from django.urls import reverse
+class DeleteCommentUserView(LoginRequiredMixin, View):
+    model=Comment
+    template_name='post/delete_comment.html'
+     
+    def get(self, request, pk, *args, **kwargs):
+        comment= get_object_or_404(Comment, pk=pk, author=request.user)
+        comment.is_delete=True
+        comment.save()
+        messages.success(request," Comment deleted succesfuly ")
+
+        return redirect('post-details', pk=comment.post.pk)   
+
+
+
+# class DeleteReplyCommentUserView(LoginRequiredMixin, View):
+#     def get(self, request, pk, *args, **kwargs):
+#         comment = get_object_or_404(Comment, pk=pk, author=request.user)
+
+#         if comment.parents is not None:
+#             comment.is_delete = True
+#             comment.save()
+#             messages.success(request, "Reply deleted successfully!")
+#         else:
+#             messages.error(request, "You cannot delete a main comment here!")
+
+#         return redirect('post-details', pk=comment.post.pk)
 
 
 class SearchCategoryView(ListView):
