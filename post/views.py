@@ -418,15 +418,37 @@ class AuthorPostViewforUser(ListView):
 
 
 
-#  draftPost for admin 
-class AdminDraftPostView(SuperUserRequiredMixin, ListView):
+#  allPost for admin 
+class AdminAllPostView(SuperUserRequiredMixin, ListView):
     
     template_name='dashboard/posts/list_posts.html'
     paginate_by=10  # aauta page ma kati ota post dekhauney 
 
     model=Post 
     context_object_name = 'posts'
+    queryset=Post.objects.all().order_by('-date_posted')
+
+
+#   draft post for admin
+class AdminDraftPostView(SuperUserRequiredMixin,ListView):
+    model=Post
+    template_name='dashboard/posts/draft_posts.html' 
+    paginate_by=10
+
+    context_object_name='posts'
     queryset=Post.objects.filter(is_draft=True).order_by('-date_posted')
+
+
+from accounts.views import StaffOrSuperuserRequiredMixin
+#  draft post for author 
+class AuthorDraftPostView(StaffOrSuperuserRequiredMixin,ListView):
+    model=Post
+    template_name='dashboard/posts/author_draft_posts.html'
+    paginate_by=10
+    context_object_name='posts' 
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user, is_draft=True).order_by('-date_posted')
+    
 
 #    published post for admin 
 class AdminPublishedPostView(SuperUserRequiredMixin, ListView):
@@ -437,7 +459,15 @@ class AdminPublishedPostView(SuperUserRequiredMixin, ListView):
     context_object_name='posts'
     queryset=Post.objects.filter(is_draft=False).order_by('-date_posted')
 
+# published post for author
+class AuthorPublishedPostView(StaffOrSuperuserRequiredMixin, ListView):
+    model=Post
+    template_name='dashboard/posts/author_published_posts.html'
+    paginate_by=10
+    context_object_name='posts'
 
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user, is_draft=False).order_by('-date_posted')
 
 class CatgeoryPostsAdminView(SuperUserRequiredMixin, ListView):
     model=Post

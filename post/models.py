@@ -40,6 +40,25 @@ class Post(models.Model):
         return reverse('admin_post_details', kwargs={"pk": self.pk})
     
 
+# class PostReaction(models.Model):
+#     LIKE = 'like'
+#     DISLIKE = 'dislike'
+#     REACTIONS = [
+#         (LIKE, 'Like'),
+#         (DISLIKE, 'Dislike'),
+#     ]
+
+#     reader = models.ForeignKey(User, on_delete=models.CASCADE)
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="reactions")
+#     reaction = models.CharField(max_length=10, choices=REACTIONS)
+
+#     class Meta:
+#         unique_together = ('reader', 'post')  # ensures 1 reaction per user per post
+
+#     def __str__(self):
+#         return f"{self.reader} {self.reaction} {self.post}"
+
+
 
 class PostLike(models.Model):
     reader= models.ForeignKey(User, on_delete=models.CASCADE)
@@ -49,7 +68,13 @@ class PostLike(models.Model):
     def get_absolute_url(self):
         return reverse('admin_post_details', kwargs={"pk": self.pk})
 
+class PostDislike(models.Model):
+    reader= models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    dislike_count = models.PositiveIntegerField(null=True, editable=True, default=0)
 
+    def get_absolute_url(self):
+        return reverse('admin_post_details', kwargs={"pk": self.pk})
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name='comments')

@@ -208,22 +208,22 @@
                                 <i class="ri-bubble-chart-line"></i>
                                <span> Sort By </span>
                                 </a>
-                                <div id="category-list-container"
-                                    style="display:none; position:fixed; left:220px; top:80px; width:250px; z-index:1000; background:#fff; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow-y:auto; max-height:400px;">
+                                <div class="category-list-container"
+                                    style="display:none; position:fixed; right:35px; top:150px; width:250px; z-index:1000; background:#fff; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow-y:auto; max-height:400px;">
                                 </div>   
 
-                                <div id="author-list-container" 
-                                    style="display:none; position:fixed; left:220px; top:90px; width:250px; z-index:1000; background:#fff; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow-y:auto; max-height:400px;">
+                                <div class="author-list-container" 
+                                    style="display:none; position:fixed; right:30px; top:150px; width:250px; z-index:1000; background:#fff; border:1px solid #ddd; box-shadow:0 2px 8px rgba(0,0,0,0.1); overflow-y:auto; max-height:400px;">
                                </div>
 
                                     <ul class="sub-menu" aria-expanded="false">
-                                    <li> <a href="#" data-sort-category> Catgeory</a> </li>
-                                    <li> <a href="#" data-sort-author> Author </a> </li>
+                                    <li> <a href="#" class="data-sort-category"> Catgeory</a> </li>
+                                    <li> <a href="#" class="data-sort-author"> author</a>  </li>
 
                                     <li> <a href="{% url 'post_sorted_list' %}"> Date Posted </a> </li>
                                     
                                 </ul>
-                            </li>
+                            </li> 
                             {% endif %}
 
                             {%  if request.user.is_superuser%}
@@ -244,31 +244,35 @@
 
                             
                             <li>
-                                <a href="#" class="has-arrow waves-effect">
-                                <i class="ri-file-list-3-fill"></i>        
-                            <span>Post</span>
-                                </a>
-                                <ul class="sub-menu" aria-expanded="false">
-                                    <li><a href="{% url 'add-post' %}">Create Post</a></li>
-                                    {% if request.user.is_superuser %}
+                                {% if request.user.is_superuser %}
+                                    <a href="{% url 'admin_post'%}" >
+                                        <i class="ri-file-list-3-fill"></i>        
+                                        <span>Post</span>
+                                    </a>
+                                {% else  %}
+                                    <a href="{% url 'my_post' %}">
+                                         <i class="ri-file-list-3-fill"></i>   
+                                          Post
+                                    </a>
+                                    {% comment %} {% if request.user.is_superuser %}
 
                                     <li><a href="{% url 'admin_post' %}">Draft Post</a></li>
 
                                     <li> <a href="{% url 'admin_published_posts'%}"> Published Post</a> </li>
                                     {% else %}
 
-                                    <li><a href="{% url 'my_post' %}">List Post</a></li>
-                                    {% endif %}
-                                </ul>
+                                    <li><a href="{% url 'my_post' %}">List Post</a></li> {% endcomment %}
+                                   
+                                 {% endif %}
                             </li>
 
                              <li>
-                                <a href="#" class="has-arrow waves-effect">
+                                <a href="{% url 'category_list' %}" >
                                     <i class="ri-list-check-2"></i>
-                                    <span>Category </span>
+                                    <span> Category </span>
                                 </a>
 
-                                <ul class="sub-menu" aria-expanded="false">
+                                {% comment %} <ul class="sub-menu" aria-expanded="false">
                                     {% if request.user.is_superuser %}
 
                                         <li><a href="{% url 'category_add' %}">Create Category </a></li>
@@ -277,19 +281,19 @@
                                     <li><a href="{% url 'category_list' %}">List Category</a></li>
                                                    
                                     
-                                </ul>
+                                </ul> {% endcomment %}
                             </li>
 
                             {%  if request.user.is_superuser%}
                                 <li>
-                                    <a href="#" class="has-arrow waves-effect">
+                                    <a href="{% url 'admin_comment_list' %}" >
                                         <i class="ri-chat-1-line"></i>
                                         <span>Comments</span>
                                     </a>
-                                    <ul class="sub-menu" aria-expanded="false">
+                                    {% comment %} <ul class="sub-menu" aria-expanded="false">
                                         <li><a href="{% url 'admin_comment_list' %}">List Comments</a></li>
                                     </ul>
-                                </li>
+                                </li> {% endcomment %}
                             {% endif %}
 
                             {%  if request.user.is_superuser%}
@@ -430,74 +434,78 @@
   });
 
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const categoryLink = document.querySelector('[data-sort-category]');
-        const categoryListContainer = document.getElementById('category-list-container');
-    
-        if (categoryLink) {
-            categoryLink.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (categoryListContainer.style.display === 'block') {
-                    categoryListContainer.style.display = 'none';
-                    categoryListContainer.innerHTML = '';
-                } else {
-                    fetch("{% url 'ajax_category_list' %}")
-                        .then(response =>response.json())
-                        .then(data => {
-                            categoryListContainer.innerHTML = data.html;
-                            categoryListContainer.style.display = 'block';
-                        });
-                }
-            });
-        }
-    
-        // Hide when clicking outside
-        document.addEventListener('click', function (e) {
-            if (
-                categoryListContainer.style.display === 'block' &&
-                !categoryListContainer.contains(e.target) &&
-                e.target !== categoryLink
-            ) {
-                categoryListContainer.style.display = 'none';
-                categoryListContainer.innerHTML = '';
+   document.addEventListener('DOMContentLoaded', function () {
+    const categoryLinks = document.getElementsByClassName('data-sort-category'); // plural
+    const categoryListContainers = document.getElementsByClassName('category-list-container')[0]; // first element
+
+    Array.from(categoryLinks).forEach(categoryLink => {
+        categoryLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (categoryListContainers.style.display === 'block') {
+                categoryListContainers.style.display = 'none';
+                categoryListContainers.innerHTML = '';
+            } else {
+                fetch("{% url 'ajax_category_list' %}")
+                    .then(response => response.json())
+                    .then(data => {
+                        categoryListContainers.innerHTML = data.html;
+                        categoryListContainers.style.display = 'block';
+                    });
             }
         });
     });
 
+    // Hide when clicking outside
+    document.addEventListener('click', function (e) {
+        if (
+            categoryListContainers.style.display === 'block' &&
+            !categoryListContainers.contains(e.target) &&
+            !e.target.classList.contains('data-sort-category')
+        ) {
+            categoryListContainers.style.display = 'none';
+            categoryListContainers.innerHTML = '';
+        }
+    });
+});
+
+
     
 
     document.addEventListener('DOMContentLoaded', function () {
-        const authorLink = document.querySelector('[data-sort-author]');
-        const authorListContainer = document.getElementById('author-list-container');
+    const authorLinks = document.getElementsByClassName('data-sort-author'); 
+    const authorListContainers = document.getElementsByClassName('author-list-container'); 
+    const authorListContainer = authorListContainers[0]; 
 
-        if (authorLink) {
-            authorLink.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (authorListContainer.style.display === 'block') {
-                    authorListContainer.style.display = 'none';
-                    authorListContainer.innerHTML = '';
-                } else {
-                    fetch("{% url 'author_list_sidebar' %}")
-                        .then(response => response.json())
-                        .then(data => {
-                            authorListContainer.innerHTML = data.html;
-                            authorListContainer.style.display = 'block';
-                        });
-                }
-            });
-        }
-        // Hide when clicking outside
-        document.addEventListener('click', function (e) {
-            if (
-                authorListContainer.style.display === 'block' &&
-                !authorListContainer.contains(e.target) &&
-                e.target !== authorLink
-            ) {
+    Array.from(authorLinks).forEach(authorLink => {
+        authorLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (authorListContainer.style.display === 'block') {
                 authorListContainer.style.display = 'none';
                 authorListContainer.innerHTML = '';
+            } else {
+                fetch("{% url 'author_list_sidebar' %}")
+                    .then(response => response.json())
+                    .then(data => {
+                        authorListContainer.innerHTML = data.html;
+                        authorListContainer.style.display = 'block';
+                    });
             }
         });
+    });
+
+    // Hide when clicking outside
+    document.addEventListener('click', function (e) {
+        if (
+            authorListContainer.style.display === 'block' &&
+            !authorListContainer.contains(e.target) &&
+            !e.target.classList.contains('data-sort-author')
+        ) {
+            authorListContainer.style.display = 'none';
+            authorListContainer.innerHTML = '';
+        }
+    });
 });
+
 
 
 
