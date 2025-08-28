@@ -19,10 +19,22 @@
 
 
 
+
 {% block content %}
+
+
+
 <div class="card m-3">
   
-
+    {% if request.user.is_superuser %}
+        <div class="d-flex justify-content-end me-3 mt-2">
+            <a href="{% url 'category_add' %}">
+                <buttton class="btn btn-primary btn-l">
+                    Create Category
+                </button>
+            </a>
+        </div>
+    {% endif %}
   <div class="card-body table-responsive">
   <table class="table table-bordered table-hover">
     <thead class="table-secondary">

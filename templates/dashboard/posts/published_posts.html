@@ -22,7 +22,28 @@
 
 <div class="card m-3">
   
+     <div class="d-flex justify-content-end me-3 mt-2">
+        <a href="{% url 'add-post' %}">
+            <buttton class="btn btn-primary btn-l">
+                Create Post 
+            </button>
+        </a>
+        <a href="{% url 'admin_draft_post'%}" class="ms-2">
+         <button class= "btn btn-secondary "> Drafts  </button>
+        </a>
+      
 
+      
+        <a href="#" class="data-sort-author btn btn-success ms-2" >
+            Authors
+        </a>
+
+        <button class="btn btn-warning ms-2">
+            <a href="#" class="text-white data-sort-category "> Categories </a>
+        </button>
+
+        {% comment %} <button type="button" data-sort-author class="btn btn-warning ms-2">Authors</button> {% endcomment %}
+    </div>
   <div class="card-body table-responsive">
   <table class="table table-bordered table-hover">
     <thead class="table-secondary">

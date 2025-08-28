@@ -1,8 +1,8 @@
 {% extends "dashboard/base_admin.html" %}
-
+{% load static %}
 
 {% block search_content %}
-<form class="app-search d-none d-lg-block" method = "get"  action = "{% url 'search_mypost'%}">
+<form class="app-search d-none d-lg-block" method = "get"  action = "{% url 'search'%}">
 
     <div class="row">
       <div class="col">
@@ -18,11 +18,11 @@
 {% endblock search_content %}
 
 
-
 {% block content %}
+
 <div class="card m-3">
   
-        <div class="d-flex justify-content-end me-3 mt-2">
+     <div class="d-flex justify-content-end me-3 mt-2">
         <a href="{% url 'add-post' %}">
             <buttton class="btn btn-primary btn-l">
                 Create Post 
@@ -31,17 +31,14 @@
         <a href="{% url 'author_draft_post'%}" class="ms-2">
          <button class= "btn btn-secondary "> Drafts  </button>
         </a>
-        <a href="{% url 'author_published_posts'%}" class="ms-2">
-         <button class= "btn btn-warning "> Published  </button>
-        </a>
+      
 
-
-        <button class="btn btn-success ms-2">
+        <button class="btn btn-warning ms-2">
             <a href="#" class="text-white data-sort-category "> Categories </a>
         </button>
+
+        {% comment %} <button type="button" data-sort-author class="btn btn-warning ms-2">Authors</button> {% endcomment %}
     </div>
-
-
   <div class="card-body table-responsive">
   <table class="table table-bordered table-hover">
     <thead class="table-secondary">
@@ -77,18 +74,15 @@
                     </td>
                     <td> {{ post.date_posted}}</td>
                     <td>
-                    
-                        <div class="d-flex gap-2 align-items-center">
-                            <a href="{% url 'admin_post_details' post.pk %}" class="btn btn-secondary"><i class="ri-eye-fill"></i></a>
-
-
-                                <a href="{% url 'update-post' post.pk %}" class="btn btn-primary"><i class="ri-edit-2-line"></i></a>
-                                <form method="post" action="{% url 'delete-post' post.pk %}" class="m-0 p-0">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger" onclick="return confirmDeleteModal(event)"><i class="ri-delete-bin-line"></i></button>
-                                </form>
-
+                          <div class="d-flex gap-2 align-items-center">
+                              <a href="{% url 'admin_post_details' post.pk %}" class="btn btn-secondary"><i class="ri-eye-fill"></i></a>
+                              <a href="{% url 'update-post' post.pk %}" class="btn btn-primary"><i class="ri-edit-2-line"></i></a>
+                              <form method="post" action="{% url 'delete-post' post.pk %}" class="m-0 p-0">
+                                  {% csrf_token %}
+                                  <button type="submit" class="btn btn-danger" onclick="return confirmDeleteModal(event)"><i class="ri-delete-bin-line"></i></button>
+                              </form>
                           </div>
+                      
                     </td>
 
                    
@@ -101,7 +95,9 @@
   </table>
   
   </div>
-  <div class="pagination row m-auto">
+
+  
+<div class="pagination row m-auto">
     <span class="step-links">
         {% if page_obj.has_previous %}
             <a href="?page=1">&laquo; first</a>
@@ -121,9 +117,5 @@
 </div>
 
 
-</div>
  
 {% endblock content %}
-
-
-

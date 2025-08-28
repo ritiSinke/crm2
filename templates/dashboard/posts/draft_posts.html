@@ -1,44 +1,31 @@
-{% extends "dashboard/base_admin.html" %}
-
-
-{% block search_content %}
-<form class="app-search d-none d-lg-block" method = "get"  action = "{% url 'search_mypost'%}">
-
-    <div class="row">
-      <div class="col">
-        <input class="form-control mr-sm-2" type="search" {% if search_result %} value="{{ search_result }}" {% endif %} placeholder="Search" aria-label="Search" name="search">
-    </div>
-    <div class="col p-0">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fas fa-search"></i></button>
-    </div> 
-    
-    </div>             
-</form>   
-
-{% endblock search_content %}
-
-
+{% extends 'dashboard/base_admin.html' %}
+{%load static %}
 
 {% block content %}
+
 <div class="card m-3">
-  
-        <div class="d-flex justify-content-end me-3 mt-2">
+      
+ <div class="d-flex justify-content-end me-3 mt-2">
         <a href="{% url 'add-post' %}">
             <buttton class="btn btn-primary btn-l">
                 Create Post 
             </button>
         </a>
-        <a href="{% url 'author_draft_post'%}" class="ms-2">
-         <button class= "btn btn-secondary "> Drafts  </button>
-        </a>
-        <a href="{% url 'author_published_posts'%}" class="ms-2">
+       
+        <a href="{% url 'admin_published_posts'%}" class="ms-2">
          <button class= "btn btn-warning "> Published  </button>
         </a>
 
+      
+        <a href="#" class="data-sort-author btn btn-success ms-2" >
+            Authors
+        </a>
 
-        <button class="btn btn-success ms-2">
+        <button class="btn btn-warning ms-2">
             <a href="#" class="text-white data-sort-category "> Categories </a>
         </button>
+
+        {% comment %} <button type="button" data-sort-author class="btn btn-warning ms-2">Authors</button> {% endcomment %}
     </div>
 
 
@@ -77,18 +64,15 @@
                     </td>
                     <td> {{ post.date_posted}}</td>
                     <td>
-                    
-                        <div class="d-flex gap-2 align-items-center">
-                            <a href="{% url 'admin_post_details' post.pk %}" class="btn btn-secondary"><i class="ri-eye-fill"></i></a>
-
-
-                                <a href="{% url 'update-post' post.pk %}" class="btn btn-primary"><i class="ri-edit-2-line"></i></a>
-                                <form method="post" action="{% url 'delete-post' post.pk %}" class="m-0 p-0">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger" onclick="return confirmDeleteModal(event)"><i class="ri-delete-bin-line"></i></button>
-                                </form>
-
+                          <div class="d-flex gap-2 align-items-center">
+                              <a href="{% url 'admin_post_details' post.pk %}" class="btn btn-secondary"><i class="ri-eye-fill"></i></a>
+                              <a href="{% url 'update-post' post.pk %}" class="btn btn-primary"><i class="ri-edit-2-line"></i></a>
+                              <form method="post" action="{% url 'delete-post' post.pk %}" class="m-0 p-0">
+                                  {% csrf_token %}
+                                  <button type="submit" class="btn btn-danger" onclick="return confirmDeleteModal(event)"><i class="ri-delete-bin-line"></i></button>
+                              </form>
                           </div>
+                      
                     </td>
 
                    
@@ -101,7 +85,9 @@
   </table>
   
   </div>
-  <div class="pagination row m-auto">
+
+  
+<div class="pagination row m-auto">
     <span class="step-links">
         {% if page_obj.has_previous %}
             <a href="?page=1">&laquo; first</a>
@@ -121,7 +107,6 @@
 </div>
 
 
-</div>
  
 {% endblock content %}
 

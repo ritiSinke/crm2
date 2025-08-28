@@ -22,8 +22,13 @@ urlpatterns=[
     path('category/<int:pk>/', views.CategoryPostsView.as_view(), name='category-posts'),
     path('category-post-admin/<int:pk>/', views.CatgeoryPostsAdminView.as_view(), name='category_posts_admin'),
     
-    path('admin-posts/',views.AdminDraftPostView.as_view(),name='admin_post'),
+    path('admin-posts/',views.AdminAllPostView.as_view(),name='admin_post'),
+    path('admin-draft-posts/', views.AdminDraftPostView.as_view(), name='admin_draft_post'),
+    path('author-draft-posts/', views.AuthorDraftPostView.as_view(), name='author_draft_post'),
+
     path('admin-published-posts/', views.AdminPublishedPostView.as_view(), name='admin_published_posts'),
+    path('author-published-posts/', views.AuthorPublishedPostView.as_view(), name='author_published_posts'),
+
     path('admin-comments-list/',views.CommentListView.as_view(), name='admin_comment_list'),
     # path('delete-comments/<int:pk>/', CommentUpdateView.as_view(),name='delete_comment'),
     
