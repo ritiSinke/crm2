@@ -21,6 +21,7 @@ urlpatterns=[
     path('contact/', views.ContactView.as_view(), name='contact'),  
     path('category/<int:pk>/', views.CategoryPostsView.as_view(), name='category-posts'),
     path('category-post-admin/<int:pk>/', views.CatgeoryPostsAdminView.as_view(), name='category_posts_admin'),
+    path('category-post-author/<int:pk>/', views.CategoryPostsUserView.as_view(), name='category_post_author'),
     
     path('admin-posts/',views.AdminAllPostView.as_view(),name='admin_post'),
     path('admin-draft-posts/', views.AdminDraftPostView.as_view(), name='admin_draft_post'),

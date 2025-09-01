@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . views import EditUserPermissionView
 from .forms import CreatePasswordResetForm
 from django.contrib.auth.views import (
    
@@ -34,5 +35,7 @@ urlpatterns=[
     path('change-staff-password/',views.StaffPasswordChange.as_view(),name='staff_password_change'),
     path('user-details/<int:pk>/', views.UserDetailView.as_view(), name='user_details'),
 
+    path('edit-user-permissions/<int:user_id>/', EditUserPermissionView.as_view(), name='edit_user_permissions'),
+    # path('edit-group-permissions/<int:group_id>/', views.edit_group_permissions, name='edit_group_permissions'),
 ]   
  

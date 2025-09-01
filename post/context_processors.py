@@ -67,8 +67,18 @@ def getFooterpost(request):
         'footer_posts': post
     }
 
+from django.db.models import Count
 
+def getTrendingPosts(request):
 
+    trending_posts = Post.objects.filter(is_draft=False) \
+                        .annotate(num_comments=Count('comments')) \
+                        .filter(num_comments__gt=0) \
+                        .order_by('-num_comments')[:5]
+     
+    return {
+        'trending_posts': trending_posts
+    }
     
 
 

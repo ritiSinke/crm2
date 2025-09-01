@@ -31,14 +31,23 @@
         <a href="{% url 'author_draft_post'%}" class="ms-2">
          <button class= "btn btn-secondary "> Drafts  </button>
         </a>
+
         <a href="{% url 'author_published_posts'%}" class="ms-2">
          <button class= "btn btn-warning "> Published  </button>
         </a>
 
+        {% comment %} <a href="#" class="data-sort-category btn btn-success ms-2">
+            Categories
+        </a> {% endcomment %}
 
-        <button class="btn btn-success ms-2">
+        
+        <a href="#" class="text-white data-sort-category btn btn-warning ms-2" onclick="console.log('clicked')">
+             Categories 
+        </a>
+
+        {% comment %} <button class="btn btn-success ms-2" onclick="console.log('clicked')">
             <a href="#" class="text-white data-sort-category "> Categories </a>
-        </button>
+        </button> {% endcomment %}
     </div>
 
 

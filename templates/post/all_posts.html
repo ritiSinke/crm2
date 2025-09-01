@@ -4,16 +4,16 @@
 
 {%load static %}
 {% comment %} Main header content  {% endcomment %}
-<div class="container-fluid mb-4">
-    <div class="row">
+<div class="container-fluid mb-4 ">
+    <div class="row align-items-end">
         <!-- Main Carousel for Featured Posts -->
-        <div class="col-lg-7 px-0">
+        <div class="col-lg-7 px-0 pt-2">
             <div class="owl-carousel main-carousel position-relative">
                 {% for post in posts|slice:":1" %}
-                <div class="position-relative overflow-hidden" style="height: 500px;">
+                <div class="position-relative overflow-hidden" style="height: 500px; border-radius: 10px;">
                     {% if post.image %}
                         <a href="{% url 'post-details' post.pk %}" style="display: block; height: 100%;">
-                            <img class="img-fluid w-100 h-100" src="{{ post.image.url }}" style="object-fit: cover;">
+                            <img class="img-fluid w-100 h-100" src="{{ post.image.url }}" style="object-fit: cover;  border-radius: 10px;">
                         </a>
                     {% endif %}
 
@@ -37,7 +37,7 @@
                         
                         <!-- ✅ Title and content still clickable -->
                         <a class="h2 text-white text-uppercase font-weight-semi-bold"
-                           href="{% url 'post-details' post.pk %}" style="pointer-events: auto;">
+                           href="{% url 'post-details' post.pk %}" style="pointer-events: auto; ">
                             {{ post.title|truncatechars:10 }}
                         </a>
 
@@ -49,108 +49,112 @@
                 </div>
                 {% endfor %}
        
-    </div>
-</div>
+            </div>
+        </div>
 
 
         <!-- Side Posts -->
-        <div class="col-lg-5 px-0 text-white">
-    <div class="row mx-0">
-        {% for post in posts|slice:"1:5" %}
-        <div class="col-md-6 px-0">
-            <div class="position-relative overflow-hidden" style="height: 250px;">
-                {% if post.image %}
-                    <a href="{% url 'post-details' post.pk %}" style="display: block; height: 100%;">
-                        <img class="img-fluid w-100 h-100" src="{{ post.image.url }}" style="object-fit: cover;">
-                    </a>
-                {% endif %}
-
-                <div class="overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: rgba(0,0,0,0.5); pointer-events: none;">
-                    <div class="mb-2" style="pointer-events: auto;">
-                        {% if post.category %}
-                            <a class="badge badge-primary text-dark text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'category-posts' post.category.id %}">
-                                {{ post.category }}
-                            </a>  {{ post.date_posted |date:"M d, Y"}}
+        <div class="col-lg-5 text-white pt-1">
+            <div class="row g-2">
+                {% for post in posts|slice:"1:5" %}
+                <div class="col-md-6">
+                    <div class="position-relative overflow-hidden" style="height: 250px; border-radius: 10px;">
+                        {% if post.image %}
+                            <a href="{% url 'post-details' post.pk %}" style="display: block; height: 100%;">
+                                <img class="img-fluid w-100 h-100" src="{{ post.image.url }}" style="object-fit: cover; border-radius: 5px;">
+                            </a>
                         {% endif %}
+                        
+                        <div class="overlay" style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: rgba(0,0,0,0.5); pointer-events: none;">
+                            <div class="mb-2" style="pointer-events: auto;">
+                                {% if post.category %}
+                                    <a class="badge badge-primary text-dark text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'category-posts' post.category.id %}">
+                                        {{ post.category }}
+                                    </a>  {{ post.date_posted |date:"M d, Y"}}
+                                {% endif %}
+                            </div>
+                            <a class="h2 m-0 text-uppercase font-weight-bold text-white" 
+                            href="{% url 'post-details' post.pk %}" style="pointer-events: auto;">
+                                {{ post.title|truncatechars:5 }}
+                            </a>
+                        </div>
                     </div>
-                    <a class="h2 m-0 text-uppercase font-weight-bold text-white" 
-                       href="{% url 'post-details' post.pk %}" style="pointer-events: auto;">
-                        {{ post.title|truncatechars:5 }}
-                    </a>
                 </div>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
-    </div>
+   </div>
 </div>
 
-    </div>
-</div>
 
 {% comment %} Featured News  {% endcomment %}
 
-<div class="container-fluid pt-5 mb-3">
-        
-        <div class="container ">
-            <div class="section-title">
-                <h4 class="m-0 text-uppercase font-weight-bold ">Featured News</h4>
-            </div>
-           
-            <div style="position: relative; width: 100%;">
-    <!-- Left arrow -->
-    <button onclick="scrollCarousel(-1)" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 2; background: none; border: none; font-size: 2rem;  color: red; ">
-        &#8249;
-    </button>
+   <div class="container-fluid pt-5 mb-3">
+    <div class="container">
+        <div class="section-title">
+            <h4 class="m-0 text-uppercase font-weight-bold">Featured News</h4>
+        </div>
 
-    <!-- Carousel Container -->
-    <div id="carousel" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 16px; padding: 10px 40px; scrollbar-width: none;">
-        {% for post in posts %}
-            <div class="items mb-4" style="flex: 0 0 auto; width: 300px;">
-                    <div class="position-relative overflow-hidden" style="height: 200px; width: 100%;">
-                        {% if post.image %}
-                            <a href="{% url 'post-details' post.pk %}" style="display: block; height: 100%;">
-                                <img class="img-fluid w-100 h-100" src="{{ post.image.url }}" style="object-fit: cover;">
-                            </a>
-                        {%endif %}
+        <!-- Carousel Wrapper -->
+        <div style="position: relative; display: flex; align-items: center; gap: 10px; ">
 
-                <div class="overlay text-white" style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: rgba(0, 0, 0, 0.5);">
-                    <div class="mb-2">
-                        {% if post.category %}
-                         <a class="badge badge-primary text-dark text-uppercase text-black font-weight-semi-bold p-2 mr-2" href="{% url 'category-posts' post.category.id %}">
-                            {{ post.category }}
-                        </a>
-                        {% endif %}
-                         {{ post.date_posted|date:"M d, Y" }}
+            <!-- Left Arrow -->
+            <button onclick="scrollCarousel(-1)" 
+                    style="background: none; border: none; font-size: 2rem; color: red; cursor: pointer;">
+                &#8249;
+            </button>
+
+            <!-- Carousel Container -->
+            <div id="carousel" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 16px; padding: 10px 0; scrollbar-width: none;">
+                {% for post in posts %}
+                    <div class="items mb-4" style="flex: 0 0 auto; width: 300px;  ">
+                        <div class="position-relative overflow-hidden" style="height: 200px; width: 100%; border-radius:10px;">
+                            {% if post.image %}
+                                <a href="{% url 'post-details' post.pk %}" style="display: block; height: 100%; ">
+                                    <img class="img-fluid w-100 h-100" src="{{ post.image.url }}" style="object-fit: cover; border-radius:10px;">
+                                </a>
+                            {% endif %}
+
+                            <div class="overlay text-white" style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: rgba(0, 0, 0, 0.5);">
+                                <div class="mb-2">
+                                    {% if post.category %}
+                                        <a class="badge badge-primary text-dark text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'category-posts' post.category.id %}">
+                                            {{ post.category }}
+                                        </a>
+                                    {% endif %}
+                                    {{ post.date_posted|date:"M d, Y" }}
+                                </div>
+                                <a class="h6 m-0 text-uppercase font-weight-semi-bold text-white" href="{% url 'post-details' post.pk %}">
+                                    {{ post.title|truncatechars:40 }}
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <a class="h6 m-0 text-uppercase font-weight-semi-bold text-white" href="{% url 'post-details' post.pk%}">
-                        {{ post.title|truncatechars:40 }}
-                    </a>
-                </div>
+                {% endfor %}
             </div>
-    
-</div>
 
-        {% endfor %}
-    </div>
-
-    <!-- Right arrow -->
-    <button onclick="scrollCarousel(1)" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 2; background: none; border: none; font-size: 2rem; color: red;">
-        &#8250;
-    </button>
-</div>
-
-<script>
-    function scrollCarousel(direction) {
-        const carousel = document.getElementById('carousel');
-        const scrollAmount = 320;  // Adjust this to match card width + gap
-        carousel.scrollLeft += direction * scrollAmount;
-    }
-</script>
+            <!-- Right Arrow -->
+            <button onclick="scrollCarousel(1)" 
+                    style="background: none; border: none; font-size: 2rem; color: red; cursor: pointer;">
+                &#8250;
+            </button>
 
         </div>
-    </div>
 
+        <!-- Scroll Script -->
+        <script>
+            function scrollCarousel(direction) {
+                const carousel = document.getElementById('carousel');
+                const scrollAmount = 320; // width of each card + gap
+                carousel.scrollLeft += direction * scrollAmount;
+            }
+        </script>
+
+    </div>
 </div>
+
+
+
     
 
 {% comment %} Latest News Section  {% endcomment %}
@@ -164,25 +168,25 @@
                                 <h4 class="m-0 text-uppercase font-weight-bold">Latest News</h4>
                             </div>
                         </div>
-                        {%  for post in posts|slice:":8" %}
-                            <div class="col-lg-6">
-                                <div class="position-relative mb-3 border-radius-10">
+                        {%  for post in posts|slice:":6" %}
+                            <div class="col-lg-4">
+                                <div class="position-relative mb-3  border" style="border-radius: 10px;">
                                     <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="{% url 'post-details' post.pk %}">
                                         {% if post.image %}
-                                        <img class="img-fluid" src="{{post.image.url}}" style="object-fit: cover; border-radius: 10px; width: 100%; height: 200px;" alt="{{ post.title }}">
+                                        <img class="img-fluid" src="{{post.image.url}}" style="object-fit: cover; border-radius: 10px; width: 100%; height: 150px;" alt="{{ post.title }}">
                                         {% else %}
                                     </a>
                                     {% endif %}
-                                    <div class="bg-white border border-top-0 p-4">
+                                    <div class="bg-white border-bottom">
                                         <div class="mb-2">
-                                            <a class="badge badge-primary  text-dark text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'category-posts' post.category.id %}">{{post.category}}</a> {{post.date_posted |date:"M d, Y"}}
+                                            <a class="badge badge-primary  text-dark text-uppercase font-weight-semi-bold p-2 mr-2 ml-1" href="{% url 'category-posts' post.category.id %}">{{post.category}}</a> {{post.date_posted |date:"M d, Y"}}
                                         </div>
-                                        <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="{% url 'post-details' post.pk %}">{{post.title|truncatechars:10}}</a>
-                                        <p class="m-0">{{post.content|truncatechars:10}}</p>
+                                        <a class="h5 d-block mb-2 ml-1 text-secondary text-uppercase font-weight-bold" href="{% url 'post-details' post.pk %}">{{post.title|truncatechars:10}}</a>
+                                        <p class="m-0">{{post.content|truncatechars:20}}</p>
                                     </div>
                                     
-                                    <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
-                                        <div class="d-flex align-items-center">
+                                    <div class="d-flex justify-content-between bg-white p-3" style="border-radius: 0 0 10px 10px;">
+                                        <div class="d-flex align-items-center ">
                                         <a href="{% url 'author_posts_user' post.author.id%}" class="text-dark">
                                             <img class="rounded-circle header-profile-user" src="{% static 'dist/assets/images/users/avatar-2.jpg' %}"  alt="Header Avatar" style="width: 20px; height: 20px;">                                    
                                             <small>   {{post.author}}</small>
@@ -202,97 +206,53 @@
                 </div>
                 
                 <div class="col-lg-4">
-                    <!-- Social Follow Start -->
-                    <div class="mb-3">
-                        <div class="section-title mb-0">
-                            <h4 class="m-0 text-uppercase font-weight-bold">Follow Us</h4>
-                        </div>
-                        <div class="bg-white border border-top-0 p-3">
-                            <a href="" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #39569E;">
-                                <i class="fab fa-facebook-f text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                                <span class="font-weight-medium">12,345 Fans</span>
-                            </a>
-                            <a href="" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #52AAF4;">
-                                <i class="fab fa-twitter text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                                <span class="font-weight-medium">12,345 Followers</span>
-                            </a>
-                            <a href="" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #0185AE;">
-                                <i class="fab fa-linkedin-in text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                                <span class="font-weight-medium">12,345 Connects</span>
-                            </a>
-                            <a href="" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #C8359D;">
-                                <i class="fab fa-instagram text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                                <span class="font-weight-medium">12,345 Followers</span>
-                            </a>
-                            <a href="" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #DC472E;">
-                                <i class="fab fa-youtube text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                                <span class="font-weight-medium">12,345 Subscribers</span>
-                            </a>
-                            <a href="" class="d-block w-100 text-white text-decoration-none" style="background: #055570;">
-                                <i class="fab fa-vimeo-v text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                                <span class="font-weight-medium">12,345 Followers</span>
-                            </a>
-                        </div>
-                    </div>
-                    <!-- Social Follow End -->
+                   
 
                     <!-- Popular News Start -->
-                <div class="mb-3">
-                    <div class="section-title mb-0">
-                        <h4 class="m-0 text-uppercase font-weight-bold">Trending News</h4>
-                    </div>
-                    <div class="bg-white border border-top-0 p-3">
-                        {% for post in trending_posts %}
-                        <div class="d-flex align-items-center bg-white mb-3" style="height: 110px;">
-                            <a href="{% url 'post-details' post.pk %}">
-                                {% if post.image %}
-                                <img class="img-fluid" src="{{ post.image.url }}"style="width: 80px; height: 80px; object-fit: cover;" alt="{{ post.title }}">
-                                {% else %}
-                                <img class="img-fluid" src="{% static 'img/default-news.jpg' %}" alt="Default image">
-                                {% endif %}
-                            </a>
-                            <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
-                                <div class="mb-2">
-                                    <a class="badge badge-primary  text-dark text-uppercase font-weight-semi-bold p-1 mr-2" href="{% url 'category-posts' post.category.id %}">
-                                       {% if post.category %}
-                                            {{ post.category.name }}
-                                        {% else %}
-                                            Uncategorized
-                                        {% endif %}
-
-                                    </a>
-                                    <a class="text-body" href="#"><small>{{ post.date_posted|date:"M d, Y" }}</small></a>
-                                </div>
-                                <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="{% url 'post-details' post.pk %}">
-                                    {{ post.title|truncatechars:50 }}
-                                </a>
-                            </div>
+                    <div class="mb-3">
+                        <div class="section-title">
+                            <h4 class="m-0 text-uppercase font-weight-bold">Trending News</h4>
                         </div>
-                        {% empty %}
-                        <p>No trending news available.</p>
-                        {% endfor %}
+                        <div class="bg-white border border-top-0 ">
+                            {% for post in trendingg_posts %}
+                            <div class="d-flex align-items-center bg-white pl-3" style="height: 80px; border-radius: 10px;">
+                                <a href="{% url 'post-details' post.pk %}">
+                                    {% if post.image %}
+                                    <img class="img-fluid" src="{{ post.image.url }}"style="width: 80px; height: 60px; object-fit: cover; border-radius:10px;" alt="{{ post.title }}">
+                                    {% else %}
+                                    <img class="img-fluid" src="{% static 'img/default-news.jpg' %}" alt="Default image">
+                                    {% endif %}
+                                </a>
+                                <div class="w-100 h-70 px-3 d-flex flex-column justify-content-center ">
+                                    <div class="mb-2">
+                                        <a class="badge badge-primary  text-dark text-uppercase font-weight-semi-bold p-1 mr-2" href="{% url 'category-posts' post.category.id %}">
+                                        {% if post.category %}
+                                                {{ post.category.name }}
+                                            {% else %}
+                                                Uncategorized
+                                            {% endif %}
+
+                                        </a>
+                                        <a class="text-body" href="#"><small>{{ post.date_posted|date:"M d, Y" }}</small></a>
+                                    </div>
+                                    <a class="h6 text-secondary text-uppercase font-weight-bold" href="{% url 'post-details' post.pk %}">
+                                        {{ post.title|truncatechars:50 }}
+                                    </a>
+                                </div>
+                            </div>
+                                {% if not forloop.last %}
+                                <hr>
+                                {% endif %}                      
+                              {% empty %}
+                            <p>No trending news available.</p>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
 
                     <!-- Popular News End -->
 
                     <!-- Newsletter Start -->
-                    <div class="mb-3">
-                        <div class="section-title mb-0">
-                            <h4 class="m-0 text-uppercase font-weight-bold">Newsletter</h4>
-                        </div>
-                        <div class="bg-white text-center border border-top-0 p-3">
-                            <p>Aliqu justo et labore at eirmod justo sea erat diam dolor diam vero kasd</p>
-                            <div class="input-group mb-2" style="width: 100%;">
-                                <input type="text" class="form-control form-control-lg" placeholder="Your Email">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary font-weight-bold px-3">Sign Up</button>
-                                </div>
-                            </div>
-                            <small>Lorem ipsum dolor sit amet elit</small>
-                        </div>
-                    </div>
-                    <!-- Newsletter End -->
+                   
 
                     <!-- Tags Start -->
                     <div class="mb-3">

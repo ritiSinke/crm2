@@ -75,6 +75,7 @@ TEMPLATES = [
                 'post.context_processors.getcategories',
                 'post.context_processors.popular_posts',
                 'post.context_processors.getFooterpost',
+                'post.context_processors.getTrendingPosts',
 
             ],
         },

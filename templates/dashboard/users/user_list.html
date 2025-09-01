@@ -52,6 +52,9 @@
                           {% csrf_token %}
                           <button type="submit" class="btn btn-danger" onclick="return confirmDeleteModal(event)"><i class="ri-delete-bin-line"></i></button>
                         </form>  
+
+                        <a href="{% url 'edit_user_permissions' user.id %}" class="btn btn-success"> <i class="ri-key-2-fill"></i></a>
+
                       </div>
                 </td>
 

@@ -336,13 +336,13 @@ def all_posts(request):
     trending_posts = Post.objects.filter(is_draft=False) \
                         .annotate(num_comments=Count('comments')) \
                         .filter(num_comments__gt=0) \
-                        .order_by('-num_comments')[:5]
+                        .order_by('-num_comments')[:3]
 
     return render(request, 'post/all_posts.html', {
         'posts': posts,
         'is_author': is_author,
         'categories' : categories,
-        'trending_posts': trending_posts
+        'trendingg_posts': trending_posts
     })
 
 
@@ -485,6 +485,24 @@ class CatgeoryPostsAdminView(SuperUserRequiredMixin, ListView):
         context['category'] = get_object_or_404(Category, pk=self.kwargs.get('pk'))
         return context 
     
+#  each user ko category 
+class CategoryPostsUserView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'dashboard/category/category_post_author.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+
+    def get_queryset(self):
+        category_pk = self.kwargs.get('pk')
+        category = get_object_or_404(Category, pk=category_pk)
+        # Filter posts by category AND current logged-in user
+        return Post.objects.filter(category=category, author=self.request.user).order_by('-date_posted')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = get_object_or_404(Category, pk=self.kwargs.get('pk'))
+        return context
+
 class CommentListView(SuperUserRequiredMixin, ListView):
     template_name='dashboard/comments/admin_comments_list.html'
     model=Comment

@@ -91,3 +91,39 @@ class AddUserForm(UserCreationForm):
         for field_name,field in self.fields.items():
             field.widget.attrs['class']='form-control'
             field.help_text = ''
+
+from django.contrib.auth.models import Permission
+
+class UserPermissionForm(forms.ModelForm):
+    permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'is_active', 'is_staff', 'is_superuser', 'permissions']
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        # set all selected permissions at once
+        user.user_permissions.set(self.cleaned_data['permissions'])
+        return user
+
+
+        
+
+
+from django.contrib.auth.models import Group
+
+class GroupPermissionForm(forms.ModelForm):
+    permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    class Meta:
+        model = Group
+        fields = ['name', 'permissions']

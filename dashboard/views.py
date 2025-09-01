@@ -216,15 +216,26 @@ class NotificationView(ListView, StaffOrSuperuserRequiredMixin):
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 # for admin ko sorting 
-class AjaxCategoryListView( SuperUserRequiredMixin,ListView):
+class AjaxCategoryListView(StaffOrSuperuserRequiredMixin, ListView):
     model = Category
     template_name = 'dashboard/category/partial_category_list.html'
     context_object_name = 'categories'
 
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
-        html = render_to_string(self.template_name, {self.context_object_name: self.object_list})
+        
+        # Debugging: print all categories
+        for category in self.object_list:
+            print(f"Category Name: {category.name} | ID: {category.id}")
+        
+        # Render template with request
+        html = render_to_string(
+            self.template_name,
+            {self.context_object_name: self.object_list},
+            request=request
+        )
         return JsonResponse({'html': html})
+
     
 
 
