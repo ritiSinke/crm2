@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from . import forms as fm 
@@ -328,3 +328,45 @@ class UserDetailView(DetailView, SuperUserRequiredMixin):
     context_object_name = 'users'
 
    
+from .forms import UserPermissionForm
+from django.contrib.auth.models import Permission
+
+class EditUserPermissionView(UserPassesTestMixin, UpdateView):
+    model = Users
+    form_class = UserPermissionForm
+    template_name = 'dashboard/users/edit_user_permissions.html'
+    pk_url_kwarg = 'user_id'
+    success_url = reverse_lazy('user_list')
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['permissions'].queryset = Permission.objects.all()
+        form.initial['permissions'] = self.object.user_permissions.all()  # <--- set initial here
+        return form
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.save()
+        form.save_m2m()
+        messages.success(self.request, f"Permissions for '{self.object.username}' updated successfully.")
+        return super().form_valid(form)
+
+
+
+
+# Group ko permission edit
+# def edit_group_permissions(request, group_id):
+#     group = get_object_or_404(Group, id=group_id)
+#     if request.method == "POST":
+#         form = GroupPermissionForm(request.POST, instance=group)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('group_list')
+#     else:
+#         form = GroupPermissionForm(instance=group)
+#         form.fields['permissions'].initial = group.permissions.all()
+
+#     return render(request, "accounts/edit_group_permissions.html", {"form": form, "group": group})

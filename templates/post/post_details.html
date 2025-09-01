@@ -6,12 +6,14 @@
 
 <div class="container-fluid">
     <div class="container">
-        <div class="row">
+        <div class="row align-items-start"><!-- Align items center to vertically center RHS -->
+            
+            <!-- Main Content -->
             <div class="col-lg-8">
                 <!-- News Detail Start -->
                 <div class="position-relative mb-3">
                     {% if post.image %}
-                        <img class="img-fluid w-100" src="{{ post.image.url }}" style="object-fit: cover;">
+                        <img class="img-fluid w-100" src="{{ post.image.url }}" style="object-fit: cover; border-radius: 10px;">
                     {% else %}
                         <img class="img-fluid w-100" src="{% static 'img/news-700x435-1.jpg' %}" style="object-fit: cover;" alt="Default image">
                     {% endif %}
@@ -37,7 +39,7 @@
                 <!-- News Detail End -->
 
                 <!-- Likes Section -->
-                <div class="mb-3">
+                <div class="mb-3"  >
                     <a href="{% url 'like-post' post.pk %}" class="btn btn-primary btn-sm">Like Post</a>
 
                     <span class="ms-2 position-relative d-inline-block" style="cursor: pointer;" id="likes-container">
@@ -81,7 +83,7 @@
                                 </form>
                             {% endif %}
 
-                            {% for reply in comment.replies.all%}
+                            {% for reply in comment.replies.all %}
                                 {% if not reply.is_delete %}
                                     <div class="ms-3 mt-2 border-start ps-2">
                                         <strong>{{ reply.author.username }}</strong> ({{ reply.date_posted|date:"SHORT_DATETIME_FORMAT" }}):<br>
@@ -111,6 +113,43 @@
                 </div>
 
             </div>
+
+            <!-- Trending News on RHS, vertically centered -->
+            <div class="col-lg-4" style="margin-top: 6rem; position: sticky; top: 20px;">
+                <div class="mb-3  position-sticky" style="top: 20px;">
+                    <div class="section-title">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Trending News</h4>
+                    </div>
+                    <div class="bg-white border border-top-0">
+                        {% for post in trending_posts %}
+                        <div class="d-flex align-items-center bg-white pl-3" style="height: 80px; border-radius: 10px;">
+                            <a href="{% url 'post-details' post.pk %}"> 
+                                {% if post.image %}
+                                <img class="img-fluid" src="{{ post.image.url }}" style="width: 80px; height: 60px; object-fit: cover; border-radius:10px;" alt="{{ post.title }}">
+                                {% else %}
+                                <img class="img-fluid" src="{% static 'img/default-news.jpg' %}" alt="Default image">
+                                {% endif %}
+                            </a>
+                            <div class="w-100 h-70 px-3 d-flex flex-column justify-content-center">
+                                <div class="mb-2">
+                                    <a class="badge badge-primary text-dark text-uppercase font-weight-semi-bold p-1 mr-2" href="{% url 'category-posts' post.category.id %}">
+                                        {% if post.category %} {{ post.category.name }} {% else %} Uncategorized {% endif %}
+                                    </a>
+                                    <a class="text-body" href="#"><small>{{ post.date_posted|date:"M d, Y" }}</small></a>
+                                </div>
+                                <a class="h6 text-secondary text-uppercase font-weight-bold" href="{% url 'post-details' post.pk %}">
+                                    {{ post.title|truncatechars:50 }}
+                                </a>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% empty %}
+                        <p>No trending news available.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

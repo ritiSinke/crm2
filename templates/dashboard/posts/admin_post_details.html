@@ -20,19 +20,19 @@
 
 {% block content %}
 
-<div class="container-fluid">
+<div class="container-fluid " style="margin: 20px 100px;">
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
                 <!-- News Detail Start -->
-                <div class="position-relative mb-3">
+                <div class="position-relative ">
                     {% if post.image %}
-                        <img class="img-fluid w-100" src="{{ post.image.url }}" style="object-fit: cover;">
+                        <img class="img-fluid w-100" src="{{ post.image.url }}" style="object-fit: cover; border-radius: 5px;" alt="Post image">
                     {% else %}
                         <img class="img-fluid w-100" src="{% static 'img/news-700x435-1.jpg' %}" style="object-fit: cover;" alt="Default image">
                     {% endif %}
                     
-                    <div class="bg-white border border-top-0 p-4">
+                    <div class="bg-white border border-top-0 ">
                         <div class="mb-3">
                             <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2 text-dark"
                                 href="#">{{ post.category.name }}</a>

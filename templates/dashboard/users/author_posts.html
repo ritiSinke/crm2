@@ -1,4 +1,3 @@
-
 {% extends 'dashboard/base_admin.html' %}
 {% load static %}
 
@@ -6,7 +5,7 @@
 
 <div class="container mt-4">
      
-     <div class="d-flex justify-content-end me-3 mt-2">
+    <div class="d-flex justify-content-end me-3 mt-2">
         <a href="{% url 'add-post' %}">
             <buttton class="btn btn-primary btn-l">
                 Create Post 
@@ -31,50 +30,42 @@
         {% comment %} <button type="button" data-sort-author class="btn btn-warning ms-2">Authors</button> {% endcomment %}
     </div>
   
-    <h2>Posts  for {{author}}</h2>
-   <div class="container-fluid">
-        <div class="container">
-            <div class="row">         
-                {%  for post in posts %}
-                    <div class="col-lg-4">
-                        <div class="position-relative mb-3 border-radius-10">
-                            <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="{% url 'admin_post_details' post.pk %}">
-                                {% if post.image %}
-                                <img class="img-fluid" src="{{post.image.url}}" style="object-fit: cover; border-radius: 10px; width: 100%; height: 200px;" alt="{{ post.title }}">
-                                {% else %}
-                            </a>
-                            {% endif %}
-                            <div class="bg-white border border-top-0 p-4">
-                                <div class="mb-2">
-                                    <a class="badge badge-primary  text-dark text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'category-posts' post.category.id %}">{{post.category}}</a> {{post.date_posted |date:"M d, Y"}}
-                                </div>
-                                <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="{% url 'admin_post_details' post.pk %}">{{post.title|truncatechars:10}}</a>
-                                <p class="m-0">{{post.content|truncatechars:10}}</p>
-                            </div>
-                            
-                            <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
-                                <div class="d-flex align-items-center">
-                                <img class="rounded-circle header-profile-user" src="{% static 'dist/assets/images/users/avatar-2.jpg' %}"  alt="Header Avatar" style="width: 20px; height: 20px;">                                    
-                                <small>   {{post.author}}</small>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                <small class="ml-3"><i class="far fa-comment mr-2"></i> {{ post.comment_count }} comments</small>
-                                </div>
-                            </div>
-                        </div>
+    <h2 class="mt-4">Posts for {{ author }}</h2>
+
+    <div class="row g-4 mt-3">
+        {% for post in posts %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 shadow-sm border-0 rounded-3">
+                
+                {% if post.image %}
+                <img class="card-img-top" src="{{ post.image.url }}" alt="{{ post.title }}"
+                     style="object-fit: cover; height: 200px; border-radius: 5px;">
+                {% endif %}
+                
+                <div class="card-body">
+                    <div class="mb-2 d-flex justify-content-between align-items-center">
+                        <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2 text-dark" href="{% url 'category_posts_admin' post.category.id %}">{{post.category}}</a> 
+
+                        <small class="text-muted">{{ post.date_posted|date:"M d, Y" }}</small>
                     </div>
-                {% endfor %}
-            
-                    </div>
+
+                    <h5 class="card-title text-uppercase text-truncate">{{ post.title }}</h5>
+                    <p class="card-text text-truncate">{{ post.content }}</p>
                 </div>
 
-                   
+                <div class="card-footer d-flex justify-content-between align-items-center bg-white border-top-0">
+                    <div class="d-flex align-items-center">
+                        <img class="rounded-circle me-2" src="{% static 'dist/assets/images/users/avatar-2.jpg' %}" 
+                             alt="Avatar" style="width: 24px; height: 24px;">
+                        <small>{{ post.author }}</small>
+                    </div>
+                    <small><i class="far fa-comment me-1"></i>{{ post.comment_count }} comments</small>
+                </div>
+                
+            </div>
         </div>
+        {% endfor %}
     </div>
 </div>
 
 {% endblock content %}
-
-
-
-

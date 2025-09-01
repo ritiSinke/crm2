@@ -3,7 +3,11 @@
 <ul class="list-group">
     {% for category in categories %}
         <li class="list-group-item">
-            <a href="{% url 'category_posts_admin' category.pk %}" class="category-link">{{ category.name }}</a>
+            {% if request.user.is_superuser %}
+             <a href="{% url 'category_posts_admin' category.pk %}" class="category-link">{{ category.name }}</a>
+            {% else %}
+             <a href="{% url 'category_post_author' category.pk %}" class="category-link">{{ category.name }}</a>
+             {% endif %}
         </li>
     {% empty %}
         <li class="list-group-item text-muted">No categories found.</li>
