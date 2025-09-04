@@ -12,14 +12,14 @@
             <div class="row">         
                 {%  for post in posts %}
                     <div class="col-lg-4">
-                        <div class="position-relative mb-3 border-radius-10">
-                            <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="{% url 'post-details' post.pk %}">
+                        <div class="position-relative mb-3 border border-radius-10">
+                            <a class="h4 d-block text-secondary text-uppercase font-weight-bold" href="{% url 'post-details' post.pk %}">
                                 {% if post.image %}
                                 <img class="img-fluid" src="{{post.image.url}}" style="object-fit: cover; border-radius: 10px; width: 100%; height: 200px;" alt="{{ post.title }}">
                                 {% else %}
                             </a>
                             {% endif %}
-                            <div class="bg-white border border-top-0 p-4">
+                            <div class="bg-white border border-top-0 " style="padding:5px; padding-left: 10px;">
                                 <div class="mb-2">
                                     <a class="badge badge-primary  text-dark text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'category-posts' post.category.id %}">{{post.category}}</a> {{post.date_posted |date:"M d, Y"}}
                                 </div>

@@ -4,16 +4,17 @@ from dashboard.views import softDeleteComment
 from django.conf.urls.static import static
 from django.conf import settings
 
+
 urlpatterns=[
 
 
     path('', views.all_posts, name='all-posts'),
-    path ('add-post/', views.add_post, name= 'add-post'),
-    path('update-post/<int:pk>/', views.update_post, name='update-post'),
+    path ('add_post/', views.PostAddView.as_view(), name= 'add-post'),
+    path('update-post/<int:pk>/', views.UpdatePostView.as_view(), name='update-post'),
     path('post-details/<int:pk>/', views.post_details, name='post-details'),
     path('delete-post/<int:pk>/', views.delete_post, name='delete-post'),
     path('like-post/<int:pk>/', views.like_post, name='like-post'),
-    path('author-post/<int:pk>/', views.author_posts, name='author-post'),
+    # path('author-post/<int:pk>/', views.author_posts, name='author-post'),
     path('search-post/',views.search_posts, name='search_posts'  ),
     path('post/<int:pk>/likes-json/', views.post_likes, name='post-likes'),
     path('my-post/', views.AuthorPostView.as_view(), name='my_post'),

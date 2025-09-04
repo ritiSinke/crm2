@@ -32,40 +32,62 @@
   
     <h2 class="mt-4">Posts for {{ author }}</h2>
 
-    <div class="row g-4 mt-3">
-        {% for post in posts %}
-        <div class="col-lg-4 col-md-6">
-            <div class="card h-100 shadow-sm border-0 rounded-3">
-                
-                {% if post.image %}
-                <img class="card-img-top" src="{{ post.image.url }}" alt="{{ post.title }}"
-                     style="object-fit: cover; height: 200px; border-radius: 5px;">
-                {% endif %}
-                
-                <div class="card-body">
-                    <div class="mb-2 d-flex justify-content-between align-items-center">
-                        <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2 text-dark" href="{% url 'category_posts_admin' post.category.id %}">{{post.category}}</a> 
+     <div class="card-body table-responsive">
+  <table class="table table-bordered table-hover">
+    <thead class="table-secondary">
+      <tr>
+        <th scope="col">SN</th>
+        <th scope="col">Title</th>
+        <th scope="col">Status</th>
+        <th scope="col"> Image </th>
+        <th scope="col">Date Posted</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+            {% for post in posts %}
 
-                        <small class="text-muted">{{ post.date_posted|date:"M d, Y" }}</small>
-                    </div>
+                <tr>  
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{post.title}}</td>
+                    <td>
+                        {% if post.is_draft == 'True'%}
+                            <span class="badge  bg-warning"> Draft </span>
+                        {%else%}
+                            <span class="badge bg-success "> Published </span>
+        
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if post.image%}
+                             <img src={{ post.image.url }} style="max-height: 100px">
+                        {%else%}
+                             <img alt="No Image">
+                        {%endif%}
+                    </td>
+                    <td> {{ post.date_posted}}</td>
+                    <td>
+                          <div class="d-flex gap-2 align-items-center">
+                              <a href="{% url 'admin_post_details' post.pk %}" class="btn btn-secondary"><i class="ri-eye-fill"></i></a>
+                              <a href="{% url 'update-post' post.pk %}" class="btn btn-primary"><i class="ri-edit-2-line"></i></a>
+                              <form method="post" action="{% url 'delete-post' post.pk %}" class="m-0 p-0">
+                                  {% csrf_token %}
+                                  <button type="submit" class="btn btn-danger" onclick="return confirmDeleteModal(event)"><i class="ri-delete-bin-line"></i></button>
+                              </form>
+                          </div>
+                      
+                    </td>
 
-                    <h5 class="card-title text-uppercase text-truncate">{{ post.title }}</h5>
-                    <p class="card-text text-truncate">{{ post.content }}</p>
-                </div>
-
-                <div class="card-footer d-flex justify-content-between align-items-center bg-white border-top-0">
-                    <div class="d-flex align-items-center">
-                        <img class="rounded-circle me-2" src="{% static 'dist/assets/images/users/avatar-2.jpg' %}" 
-                             alt="Avatar" style="width: 24px; height: 24px;">
-                        <small>{{ post.author }}</small>
-                    </div>
-                    <small><i class="far fa-comment me-1"></i>{{ post.comment_count }} comments</small>
-                </div>
-                
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+                   
+                </tr>
+             {% endfor %}
+    
+    
+        </tbody>
+    
+  </table>
+  
+  </div>
 </div>
 
 {% endblock content %}

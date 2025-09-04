@@ -6,7 +6,7 @@
 
 <div class="container mt-4">
      
-    <h2>Posts  for {{author}}</h2>
+    <h2 style="padding: 10px; " class="text-uppercase"> {{author}}</h2>
     
      <div class="container-fluid">
         <div class="container">
@@ -20,7 +20,7 @@
                                 {% else %}
                             </a>
                             {% endif %}
-                            <div class="bg-white border border-top-0 p-4">
+                            <div class="bg-white border border-top-0 " style="padding-bottom:10px; padding-left:10px; padding-right:10px;">
                                 <div class="mb-2">
                                     <a class="badge badge-primary  text-dark text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'category-posts' post.category.id %}">{{post.category}}</a> {{post.date_posted |date:"M d, Y"}}
                                 </div>
@@ -30,8 +30,11 @@
                             
                             <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
                                 <div class="d-flex align-items-center">
-                                <img class="rounded-circle header-profile-user" src="{% static 'dist/assets/images/users/avatar-2.jpg' %}"  alt="Header Avatar" style="width: 20px; height: 20px;">                                    
-                                <small> {{post.author}}</small>
+                                <a href="{% url 'author_posts_user' post.author.id%}" class="text-dark">
+
+                                    <img class="rounded-circle header-profile-user" src="{% static 'dist/assets/images/users/avatar-2.jpg' %}"  alt="Header Avatar" style="width: 20px; height: 20px;">                                    
+                                    <small> {{post.author}}</small>
+                                </a>
                                 </div>
                                 <div class="d-flex align-items-center">
                                 <small class="ml-3"><i class="far fa-comment mr-2"></i> {{ post.comment_count }} comments</small>

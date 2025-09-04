@@ -1,0 +1,32 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Permissions: <span class="text-primary">{{ group.name }}</span></h2>
+        <a href="{% url 'group_list' %}" class="btn btn-secondary">← Back to Groups</a>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card shadow-sm p-3 mb-3" style="max-height: 500px; overflow-y: auto;">
+            {% regroup form.permissions by field.widget.attrs.app_label as app_perms %}
+            
+            {% for app in app_perms %}
+                <div class="mb-3">
+                    {% for perm in app.list %}
+                        <div class="form-check mb-2 p-2 rounded" style="border: 1px solid #ddd; transition: 0.2s; cursor: pointer;">
+                            {{ perm.tag }}
+                            <label class="form-check-label ms-1" for="{{ perm.id_for_label }}">
+                                {{ perm.choice_label }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-success">Update Permissions</button>
+    </form>
+</div>
+{% endblock %}

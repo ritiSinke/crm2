@@ -8,7 +8,7 @@
     <div class="row align-items-end">
         <!-- Main Carousel for Featured Posts -->
         <div class="col-lg-7 px-0 pt-2">
-            <div class="owl-carousel main-carousel position-relative">
+            <div class="owl-carousel main-carousel position-relative"  style="padding-left:10px;">
                 {% for post in posts|slice:":1" %}
                 <div class="position-relative overflow-hidden" style="height: 500px; border-radius: 10px;">
                     {% if post.image %}

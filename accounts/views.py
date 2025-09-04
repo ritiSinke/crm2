@@ -210,11 +210,21 @@ from django.views.generic import UpdateView
 from . import forms as fm  
 from django.contrib.auth import get_user_model
 from post.models import Notification
-class UserStatusUpdate(UpdateView, SuperUserRequiredMixin):
+class UserStatusUpdate(UpdateView, UserPassesTestMixin):
     model = get_user_model()
     template_name = 'dashboard/users/change_status.html'
     form_class = fm.UserUpdateForm
     success_url = reverse_lazy('user_list')
+
+
+    def test_func(self):
+        return self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden(" You don’t have permission to create posts.")
+        return super().handle_no_permission()
+        
 
     def form_valid(self, form):
 
@@ -339,12 +349,12 @@ class EditUserPermissionView(UserPassesTestMixin, UpdateView):
     success_url = reverse_lazy('user_list')
 
     def test_func(self):
-        return self.request.user.is_superuser
+        return self.request.user.is_superuser 
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields['permissions'].queryset = Permission.objects.all()
-        form.initial['permissions'] = self.object.user_permissions.all()  # <--- set initial here
+        form.initial['permissions'] = self.object.user_permissions.all() 
         return form
 
     def form_valid(self, form):
@@ -356,17 +366,67 @@ class EditUserPermissionView(UserPassesTestMixin, UpdateView):
 
 
 
-
+from django.contrib.auth.models import Group 
+from .forms import GroupPermissionForm
 # Group ko permission edit
-# def edit_group_permissions(request, group_id):
-#     group = get_object_or_404(Group, id=group_id)
-#     if request.method == "POST":
-#         form = GroupPermissionForm(request.POST, instance=group)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('group_list')
-#     else:
-#         form = GroupPermissionForm(instance=group)
-#         form.fields['permissions'].initial = group.permissions.all()
 
-#     return render(request, "accounts/edit_group_permissions.html", {"form": form, "group": group})
+class EditGroupPermission(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model=Group
+    template_name='dashboard/groups/edit_group_permissions.html'
+    form_class=GroupPermissionForm
+    pk_url_kwarg = 'group_id'
+    success_url = reverse_lazy('group_list')
+
+
+    def test_func(self):
+        return self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You can not chnage the permission")
+        return super().handle_no_permission()
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['permissions'].queryset = Permission.objects.all()
+        form.initial['permissions'] = self.object.permissions.all() 
+        return form
+    
+
+    def form_valid(self, form):
+        self.object=form.save(commit=False)
+        self.object.save()
+        form.save_m2m()
+        messages.success(self.request, f"Permissions for '{self.object.name}' updated successfully.")
+        return super().form_valid(form)        
+    
+
+class AddUserToGroupView(LoginRequiredMixin, UserPassesTestMixin, View):
+    model = Group
+    
+    def test_func(self):
+        return self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You cannot add users to the group.")
+        return super().handle_no_permission()
+    
+    def get(self, request, group_id):
+        group = get_object_or_404(Group, pk=group_id)
+        users = Users.objects.exclude(groups=group)   # list of users not in this group
+        return render(request, "dashboard/groups/add_users.html", {
+            "group": group,
+            "users": users
+        })
+    
+    def post(self, request, group_id):
+        group = get_object_or_404(Group, pk=group_id)
+        selected_user_ids = request.POST.getlist("users")
+
+        for user_id in selected_user_ids:
+            user = Users.objects.get(pk=user_id)
+            user.groups.add(group)
+
+        messages.success(request, f"Users added to group '{group.name}'.")
+        return redirect("groups_users", pk=group_id)

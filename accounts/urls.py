@@ -36,6 +36,9 @@ urlpatterns=[
     path('user-details/<int:pk>/', views.UserDetailView.as_view(), name='user_details'),
 
     path('edit-user-permissions/<int:user_id>/', EditUserPermissionView.as_view(), name='edit_user_permissions'),
-    # path('edit-group-permissions/<int:group_id>/', views.edit_group_permissions, name='edit_group_permissions'),
+    path('edit-group-permissions/<int:group_id>/', views.EditGroupPermission.as_view(), name='edit_group_permissions'),
+
+    path('add-users-group/<int:group_id>/', views.AddUserToGroupView.as_view(), name='add_user_group'),
+  
 ]   
  

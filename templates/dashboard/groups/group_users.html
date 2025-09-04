@@ -1,0 +1,48 @@
+{% extends "dashboard/base_admin.html" %}
+
+{%load static %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Users in {{group.name}}</h2>
+        <a href="{% url 'group_list' %}" class="btn btn-secondary">← Back to Groups</a>
+    </div>
+
+   
+
+<div class="card-body table-responsive">
+    {% if users %}
+        <table class="table table-bordered table-hover">
+            <thead class="table-secondary">
+                <tr>
+                    <th scope="col">SN</th>
+                    <th scope="col">Name</th>
+                    <th scope="col"> Email </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+
+                <tr>  
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{user.username}}</td>
+                    <td>{{user.email}}  </td>
+                   
+                </tr>
+                 {% endfor %}
+    {% else %}
+        <div class="alert alert-warning text-center">
+            No users found in this group.
+        </div>
+    {% endif %}     
+    
+    
+        </tbody>
+    
+  </table>
+  
+</div>
+
+</div>
+
+{% endblock %}
