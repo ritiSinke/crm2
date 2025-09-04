@@ -1,0 +1,47 @@
+{% extends 'dashboard/base_admin.html'%}
+
+{% block content %}
+<div class="container" style="padding-top:10px;">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Groups</h1>
+    <a href="{% url 'add_group' %}" class="btn btn-primary">
+      ➕ Create Group
+    </a>
+  </div>
+
+  <div class="row">
+    {% for group in groups %}
+      <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body text-center">
+            <h4 class="card-title">{{ group.name }}</h4>
+            <p class="text-muted">Manage users & permissions for this group</p>
+
+            <!-- View Users --> 
+            <a href="{% url 'groups_users' group.id %}" class="btn btn-outline-primary btn-sm me-2">
+              👥 Users
+            </a>
+
+            <!-- View Permissions -->
+            <a href="{% url 'edit_group_permissions' group.id %}" class="btn btn-outline-success btn-sm me-2">
+              🔑 Permissions
+            </a>
+
+            <!-- Add User to Group -->
+            <a href="{% url 'add_user_group' group.id %}" class="btn btn-outline-dark btn-sm">
+              ➕ Add User
+            </a>
+
+            <a href="{% url 'update_group' group.id%}" class="btn btn-outline-warning btn-sm mt-2">  ✏️ Update</a>
+
+            <a href="{% url 'delete_group' group.id %}" class="btn btn-outline-dark btn-sm mt-2"> 🗑 Delete </a>
+
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center">No groups found.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

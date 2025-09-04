@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required,permission_required
 from . import forms as fm 
 from .models import Post, PostLike,Comment, Category
 from django.contrib.auth import get_user_model
-from django.views.generic import FormView, ListView, DetailView 
+from django.views.generic import FormView, ListView, DetailView, CreateView,UpdateView
 from django.views.generic.edit import FormMixin
 
 from django.urls import reverse_lazy 
@@ -49,131 +49,222 @@ class SuperUserRequiredMixin( LoginRequiredMixin ,UserPassesTestMixin):
 
 from .models import Notification
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import permission_required
 
 #adding posts 
-@login_required
-# @user_passes_test(lambda u: u.is_staff)
-@staff_member_required
+# @login_required
+# # @user_passes_test(lambda u: u.is_staff)
+# @staff_member_required
+
+# @permission_required('post.add_post', raise_exception=True)
+# def add_post(request):
+#     if request.method == 'POST':
+#         form = fm.PostForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             var = form.save(commit=False)
+#             var.author = request.user
+#             var.save()
+#             messages.success(request, 'Post has been created')
+
+#             # --- Notification logic starts here ---
+#             # Get all staff users except the one who created the post
+
+#             # User = get_user_model()
+
+#             # other_staff_users = User.objects.filter(is_superuser=True)
+
+#             # # Create notifications for each staff user
+#             # for user in other_staff_users:
+#             #     Notification.objects.create(
+#             #         user=user,
+#             #         message=f"New post titled '{var.title}' created by '{request.user.username}'"
+#             #     )
+
+#             # --- Notification logic ends here ---
+
+#             if request.user.is_superuser:
+#                 return redirect('admin_post')
+#             return redirect('my_post')
+
+#         else:
+#             messages.warning(request, 'Post was not able to be created')
+#             return redirect('add-post')
+#     else:
+#         form = fm.PostForm()
+#         context = {'form': form, 'is_author': request.user.groups.filter(name='author').exists()}
+#     return render(request, 'dashboard/posts/add_post.html', context)
 
 
-def add_post(request):
-    if request.method == 'POST':
-        form = fm.PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            var = form.save(commit=False)
-            var.author = request.user
-            var.save()
-            messages.success(request, 'Post has been created')
+class PostAddView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model=Post
+    template_name='dashboard/posts/add_post.html'
+    form_class= fm.PostForm
 
-            # --- Notification logic starts here ---
-            # Get all staff users except the one who created the post
+    def test_func(self):
+        return self.request.user.has_perm("post.add_post")
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden(" You don’t have permissio1n to create posts.")
+        return super().handle_no_permission()
+    
+    def form_valid(self, form):
+        post= form.save(commit=False)
+        post.author=self.request.user
+        post.save()
+        messages.success(self.request,"Post has been succesfully added")
 
-            # User = get_user_model()
-
-            # other_staff_users = User.objects.filter(is_superuser=True)
-
-            # # Create notifications for each staff user
-            # for user in other_staff_users:
-            #     Notification.objects.create(
-            #         user=user,
-            #         message=f"New post titled '{var.title}' created by '{request.user.username}'"
-            #     )
-
-            # --- Notification logic ends here ---
-
-            if request.user.is_superuser:
-                return redirect('admin_post')
-            return redirect('my_post')
-
-        else:
-            messages.warning(request, 'Post was not able to be created')
-            return redirect('add-post')
-    else:
-        form = fm.PostForm()
-        context = {'form': form, 'is_author': request.user.groups.filter(name='author').exists()}
-    return render(request, 'dashboard/posts/add_post.html', context)
+        if self.request.user.is_superuser:
+            return redirect("admin_post")
+        return redirect("my_post")
+    
+    def form_invalid(self, form):
+        messages.warning( self.request,"Post unable to create")
+        return redirect ('add-post')
+    
+    def get_context_data(self, **kwargs):
+        context=super().get_context_data(**kwargs)
+        context["is_author"] = self.request.user.groups.filter(name="author").exists()
+        return context
+ 
+    
 
 
-#updating posts 
-@login_required
-@staff_member_required
+# #updating posts 
+# @login_required
+# @staff_member_required
 
-def update_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    User = get_user_model()
+# def update_post(request, pk):
+#     post = get_object_or_404(Post, pk=pk)
+#     User = get_user_model()
 
     
-    if not (request.user == post.author or request.user.is_superuser):
-        return HttpResponseForbidden('You are not authorised')
+#     if not (request.user == post.author or request.user.is_superuser):
+#         return HttpResponseForbidden('You are not authorised')
 
-    if request.method == 'POST':
-        form = fm.PostForm(request.POST, request.FILES, instance=post)
-        if form.is_valid():
-            form.save()
+#     if request.method == 'POST':
+#         form = fm.PostForm(request.POST, request.FILES, instance=post)
+#         if form.is_valid():
+#             form.save()
 
             
-            # Send notifications to other staff users
-            superusers=User.objects.filter(is_superuser=True)
-            editor=request.user
+#             # Send notifications to other staff users
+#             superusers=User.objects.filter(is_superuser=True)
+#             editor=request.user
 
-            for admin in superusers:
-                Notification.objects.create(
-                    user=admin,
-                    message=f" Post '{post.title}' has been updated by {editor.username}",
-                    model_name="post.Post",
-                    model_id=post.id
+#             for admin in superusers:
+#                 Notification.objects.create(
+#                     user=admin,
+#                     message=f" Post '{post.title}' has been updated by {editor.username}",
+#                     model_name="post.Post",
+#                     model_id=post.id
 
-                )
+#                 )
 
-            if post.author not in superusers:
-                Notification.objects.create(
-                    user=post.author,
+#             if post.author not in superusers:
+#                 Notification.objects.create(
+#                     user=post.author,
 
-                    #  yo use garna mildaina kna bhaney yesle post ko author lai access gana sakidaina so use this in update_post ma 
-                    message=f" Post '{post.title}' has been updated by {editor.username}",
-                    model_name="post.Post",
-                    model_id=post.id
+#                     #  yo use garna mildaina kna bhaney yesle post ko author lai access gana sakidaina so use this in update_post ma 
+#                     message=f" Post '{post.title}' has been updated by {editor.username}",
+#                     model_name="post.Post",
+#                     model_id=post.id
+
+# #             )
 
 #             )
-
-            )
                 
-            messages.success(request, 'Post updated successfully ')
+#             messages.success(request, 'Post updated successfully ')
             
-            if request.user.is_superuser:
-                return redirect('admin_post')
-            else:
-                return redirect('my_post')
+#             if request.user.is_superuser:
+#                 return redirect('admin_post')
+#             else:
+#                 return redirect('my_post')
+#         else:
+#             messages.warning(request, 'Unable to update post. Please check the form.')
+#             return redirect('update-post', pk=post.pk)
+    
+#     else:
+#         form = fm.PostForm(instance=post)
+
+#     context = {'form': form, 'post': post}
+#     return render(request, 'dashboard/posts/add_post.html', context)
+    
+
+class UpdatePostView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model=Post
+    template_name='dashboard/posts/add_post.html'
+    form_class= fm.PostForm
+    pk_url_kwarg = "pk"
+
+
+    def test_func(self):
+         return self.request.user.has_perm("post.delete_post")
+    
+    def handle_no_permission(self):
+            if self.request.user.is_authenticated:
+                return HttpResponseForbidden("You don’t have permission to create posts.")
+            return super().handle_no_permission()
+    
+    def form_valid(self, form):
+        post=form.save(commit=False)
+        post.author=self.request.user
+        post.save()
+
+        
+            
+            # Send notifications to other staff users
+        superusers=User.objects.filter(is_superuser=True)
+        editor=self.request.user
+
+        for admin in superusers:
+             Notification.objects.create(
+                 user=admin,
+                 message=f" Post '{post.title}' has been updated by {editor.username}",
+                 model_name="post.Post",
+                 model_id=post.id
+             )
+        if post.author not in superusers:
+             Notification.objects.create(
+                 user=post.author,
+                 #  yo use garna mildaina kna bhaney yesle post ko author lai access gana sakidaina so use this in update_post ma 
+                 message=f" Post '{post.title}' has been updated by {editor.username}",
+                 model_name="post.Post",
+                 model_id=post.id
+#            )
+         )
+             
+
+        if self.request.user.is_superuser:
+            return redirect( 'admin_post')
+        
         else:
-            messages.warning(request, 'Unable to update post. Please check the form.')
-            return redirect('update-post', pk=post.pk)
+            return redirect('my_post')
+        
+    def form_invalid(self, form):
+       messages.warning(self.request,"Post unable to update")
+       return redirect("update-post", pk=self.get_object().pk)    
     
-    else:
-        form = fm.PostForm(instance=post)
-
-    context = {'form': form, 'post': post}
-    return render(request, 'dashboard/posts/add_post.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["post"] = self.get_object()
+        return context
     
-
-
-    
-
 
 # deleting posts
-@login_required
-@staff_member_required
 
+@permission_required('post.delete_post', raise_exception=True)
 def delete_post(request,pk):
     post= Post.objects.get(pk=pk)
     
-    if  not (request.user == post.author or request.user.is_superuser):
-        raise PermissionDenied
-    
-    else: 
-        post.delete()
+   
+    post.delete()
 
-        messages.success(request,"Post deleted")
-        return redirect('admin_post')
+    messages.success(request,"Post deleted")
+    if request.user.is_superuser:
+     return redirect('admin_post')
+    else:
+        return redirect('my_post')
 
 
 
@@ -222,15 +313,15 @@ def post_details(request,pk):
 
 
 #author posts
-@login_required
-@staff_member_required
-def author_posts(request,pk):
-   author = get_user_model().objects.get(pk=pk)
-   posts = Post.objects.filter(author=author, is_draft='False')
-#    breakpoint()
+# @login_required
+# @staff_member_required
+# def author_posts(request,pk):
+#    author = get_user_model().objects.get(pk=pk)
+#    posts = Post.objects.filter(author=author, is_draft='False')
+# #    breakpoint()
   
-   context ={ 'author':author, 'posts': posts}
-   return render (request, 'post/author_post.html',context)
+#    context ={ 'author':author, 'posts': posts}
+#    return render (request, 'post/author_post.html',context)
 
 
 
@@ -250,12 +341,21 @@ from django.core.paginator import Paginator
 #     }
 #     return render(request, 'dashboard/posts/my_post.html', context)
 
-class AuthorPostView(ListView, ):
+class AuthorPostView(  UserPassesTestMixin, ListView):
 
     model= Post
     template_name="dashboard/posts/my_post.html"
     paginate_by=10
     context_object_name='posts'
+
+  
+    def test_func(self):
+        return self.request.user.is_staff 
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden(" You don’t have permission to create posts.")
+        return super().handle_no_permission()
 
     def get_queryset(self):
         return Post.objects.filter(author = self.request.user ).order_by('-date_posted')
@@ -266,8 +366,8 @@ class AuthorPostView(ListView, ):
 
 from accounts.models import User 
 # # like posts 
-@login_required
-
+#  because of function based yesma 403 forbidden nai dekhauxa so instaed use class based so that it can redirect 
+@permission_required('post.add_postlike', raise_exception=True)
 def like_post(request, pk):
     post = Post.objects.get(pk=pk) 
     post_like_qs = PostLike.objects.filter(post=post, reader=request.user)
@@ -311,7 +411,7 @@ def like_post(request, pk):
 
 
 
-@login_required 
+@permission_required('post.view_postlike', raise_exception=True)
 def post_likes(request, pk):
     post = get_object_or_404(Post, pk=pk)
     likes_qs = PostLike.objects.filter(post=post).select_related('reader')
@@ -320,13 +420,12 @@ def post_likes(request, pk):
 
     return JsonResponse({'likes': likes})
 
-
 from django.db.models import Count,Q
 
 # show all trending  post from db is the post is not draft 
 def all_posts(request):
     is_author = False
-
+    
     if request.user.is_authenticated:
         is_author = request.user.groups.filter(name='author').exists()
 
@@ -364,11 +463,21 @@ def search_posts(request):
 
 
 # contact page viewing 
-class ContactView(FormView):
+
+class ContactView(UserPassesTestMixin, FormView):
     template_name = 'post/staticPages/contact.html'
     form_class = ContactForm
     success_url = reverse_lazy('contact')
     
+    def test_func(self):
+        return self.request.user.has_perm("post.add_contact")
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden(" You don’t have permission to create posts.")    
+        return super().handle_no_permission()
+    
+
     def form_valid(self, form):
        
        self.object = form.save()
@@ -419,7 +528,7 @@ class AuthorPostViewforUser(ListView):
 
 
 #  allPost for admin 
-class AdminAllPostView(SuperUserRequiredMixin, ListView):
+class AdminAllPostView(UserPassesTestMixin, ListView):
     
     template_name='dashboard/posts/list_posts.html'
     paginate_by=10  # aauta page ma kati ota post dekhauney 
@@ -427,6 +536,14 @@ class AdminAllPostView(SuperUserRequiredMixin, ListView):
     model=Post 
     context_object_name = 'posts'
     queryset=Post.objects.all().order_by('-date_posted')
+
+    def test_func(self):
+        return self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return redirect("You don't have permisssion")
+        return super().handle_no_permission()
 
 
 #   draft post for admin
@@ -441,11 +558,22 @@ class AdminDraftPostView(SuperUserRequiredMixin,ListView):
 
 from accounts.views import StaffOrSuperuserRequiredMixin
 #  draft post for author 
-class AuthorDraftPostView(StaffOrSuperuserRequiredMixin,ListView):
+class AuthorDraftPostView(UserPassesTestMixin,ListView):
     model=Post
     template_name='dashboard/posts/author_draft_posts.html'
     paginate_by=10
     context_object_name='posts' 
+
+    def test_func(self):
+        return self.request.user.is_staff
+    
+    def handle_no_permission(self):
+         if self.request.user.is_authenticated:
+            return HttpResponseForbidden("❌ You don’t have permission to create posts.")
+         
+         return super().handle_no_permission()
+    
+
     def get_queryset(self):
         return Post.objects.filter(author=self.request.user, is_draft=True).order_by('-date_posted')
     
@@ -460,12 +588,18 @@ class AdminPublishedPostView(SuperUserRequiredMixin, ListView):
     queryset=Post.objects.filter(is_draft=False).order_by('-date_posted')
 
 # published post for author
-class AuthorPublishedPostView(StaffOrSuperuserRequiredMixin, ListView):
+class AuthorPublishedPostView(UserPassesTestMixin, ListView):
     model=Post
     template_name='dashboard/posts/author_published_posts.html'
     paginate_by=10
     context_object_name='posts'
 
+    def test_func(self):
+        return self.request.user.is_staff
+    
+    def handle_no_permission(self):
+        return super().handle_no_permission()
+    
     def get_queryset(self):
         return Post.objects.filter(author=self.request.user, is_draft=False).order_by('-date_posted')
 
@@ -486,16 +620,24 @@ class CatgeoryPostsAdminView(SuperUserRequiredMixin, ListView):
         return context 
     
 #  each user ko category 
-class CategoryPostsUserView(LoginRequiredMixin, ListView):
+class CategoryPostsUserView( LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Post
     template_name = 'dashboard/category/category_post_author.html'
     context_object_name = 'posts'
     paginate_by = 10
 
+    def test_func(self):
+        return self.request.user.is_staff
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not authorized to access the page")
+
+        return super().handle_no_permission()
+
     def get_queryset(self):
         category_pk = self.kwargs.get('pk')
         category = get_object_or_404(Category, pk=category_pk)
-        # Filter posts by category AND current logged-in user
         return Post.objects.filter(category=category, author=self.request.user).order_by('-date_posted')
 
     def get_context_data(self, **kwargs):
@@ -517,11 +659,11 @@ class CommentListView(SuperUserRequiredMixin, ListView):
 
 # @method_decorator(staff_member_required, name='dispatch')
 
-class AdminPostDetailsView(LoginRequiredMixin, UserPassesTestMixin, FormMixin, DetailView):
+class AdminPostDetailsView( UserPassesTestMixin, LoginRequiredMixin,  FormMixin, DetailView):
     template_name = 'dashboard/posts/admin_post_details.html'
     model = Post
     context_object_name = 'post'
-    form_class = CommentForm  # needed by FormMixin
+    form_class = CommentForm  
 
     
 
@@ -572,11 +714,20 @@ class AdminPostDetailsView(LoginRequiredMixin, UserPassesTestMixin, FormMixin, D
 
 
 
-class SearchPostView(ListView):
+class SearchPostView( UserPassesTestMixin, ListView):
 
     model=Post
     template_name= 'dashboard/posts/search_posts.html'
     context_object_name= 'posts'
+
+    def test_func(self):
+        return self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not authorized to access the page")
+
+        return super().handle_no_permission()
 
     def get_queryset(self):
         queryset = Post.objects.all()
@@ -689,12 +840,19 @@ class EditCommentView(SuperUserRequiredMixin, UpdateView ):
 
 
 #  this is for user to edit their own comment
-class EditCommentUserView(LoginRequiredMixin, UpdateView):
+class EditCommentUserView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model=Comment
     template_name='post/edit_comment.html'
     form_class=CommentForm
     context_object_name = 'comment'
 
+    def test_func(self):
+        return self.request.user.has_perm("post.change_comment")
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not authorised to access the page to delete the comment")
+        return super().handle_no_permission() 
 
     def get_success_url(self):
         return reverse_lazy('post-details', kwargs={'pk': self.object.post.pk})
@@ -712,10 +870,19 @@ class EditCommentUserView(LoginRequiredMixin, UpdateView):
 
 from django.views.generic.edit import DeleteView
 from django.urls import reverse
-class DeleteCommentUserView(LoginRequiredMixin, View):
+class DeleteCommentUserView(LoginRequiredMixin, UserPassesTestMixin, View):
     model=Comment
     template_name='post/delete_comment.html'
      
+
+    def test_func(self):
+        return self.request.user.has_perm("post.delete_comment")
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not authorised to access the page to delete the comment")
+        return super().handle_no_permission()
+    
     def get(self, request, pk, *args, **kwargs):
         comment= get_object_or_404(Comment, pk=pk, author=request.user)
         comment.is_delete=True
@@ -740,12 +907,21 @@ class DeleteCommentUserView(LoginRequiredMixin, View):
 #         return redirect('post-details', pk=comment.post.pk)
 
 
-class SearchCategoryView(ListView):
+from post.views import SuperUserRequiredMixin
+
+class SearchCategoryView(ListView, UserPassesTestMixin):
 
     model=Category
     template_name= 'dashboard/category/search_category.html'
     context_object_name= 'categories'
 
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not authorised to access the page")
+        return super().handle_no_permission()
     def get_queryset(self):
         queryset = Category.objects.all()
         search_query = self.request.GET.get('search', '').strip()
@@ -763,7 +939,7 @@ class SearchCategoryView(ListView):
         return context
     
 
-class SearchUserView(ListView):
+class SearchUserView(ListView, SuperUserRequiredMixin):
     model=User
     template_name='dashboard/users/search_users.html'
     context_object_name='users'
@@ -785,7 +961,7 @@ class SearchUserView(ListView):
     
 
 
-class SearchCommentsView(ListView):
+class SearchCommentsView(ListView, SuperUserRequiredMixin):
     model= Comment
     template_name='dashboard/comments/search_comments.html'
     context_object_name='comments'
@@ -808,7 +984,7 @@ class SearchCommentsView(ListView):
 
 
 from .models import Contact
-class SearchContactView(ListView):
+class SearchContactView(ListView, SuperUserRequiredMixin):
     model= Contact
     template_name='dashboard/contact/search_contact.html'
     context_object_name= 'contacts'
@@ -830,7 +1006,7 @@ class SearchContactView(ListView):
 
 
 
-class SearchAuthorView(ListView):
+class SearchAuthorView(ListView, SuperUserRequiredMixin):
     model = User
     template_name = 'dashboard/users/search_author.html'
     context_object_name = 'authors'
@@ -850,11 +1026,18 @@ class SearchAuthorView(ListView):
         return context
         
 
-class SearchAuthorPostView(ListView):
+class SearchAuthorPostView( UserPassesTestMixin, ListView):
     model = Post
     template_name = 'dashboard/posts/search_mypost.html'
     context_object_name = 'posts'
 
+    def test_func(self):
+        return self.request.user.is_staff
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not authorized to access the page")
+        return super().handle_no_permission()
     def get_queryset(self):
         queryset = Post.objects.filter(author=self.request.user)
         search_query = self.request.GET.get('search', '').strip()

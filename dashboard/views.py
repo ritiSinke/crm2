@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.contrib import messages 
 from django.contrib.auth.decorators import login_required
 from post.models import Post 
-from django.views.generic import TemplateView,FormView,DeleteView , ListView, DetailView
+from django.views.generic import TemplateView,FormView,DeleteView , ListView, DetailView, CreateView, UpdateView
 from post.models import Post, Category, User, Comment 
 from .forms import CategoryForm
 from django.urls import reverse_lazy
@@ -10,7 +10,10 @@ from django.shortcuts import get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from post.views import SuperUserRequiredMixin
 from accounts.views import StaffOrSuperuserRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
+
 # Create your views here.
+
 
 
 @login_required
@@ -215,12 +218,22 @@ class NotificationView(ListView, StaffOrSuperuserRequiredMixin):
 
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.http import HttpResponseForbidden
+
 # for admin ko sorting 
-class AjaxCategoryListView(StaffOrSuperuserRequiredMixin, ListView):
+class AjaxCategoryListView(UserPassesTestMixin , ListView):
     model = Category
     template_name = 'dashboard/category/partial_category_list.html'
     context_object_name = 'categories'
 
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.is_staff
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not authorised to ")
+        return super().handle_no_permission()
+    
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         
@@ -289,3 +302,139 @@ class AuthorPostSortedView(SuperUserRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+    
+
+
+
+from django.contrib.auth.models import Group
+
+class GroupListView(UserPassesTestMixin, ListView):
+    model=Group
+    template_name='dashboard/groups/group_list.html'
+    context_object_name='groups'
+    queryset= Group.objects.all() 
+
+
+    def test_func(self):
+        return self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not authorized to  see teh group of db only superuser can see that")
+        return super().handle_no_permission()
+    
+
+from accounts.forms import GroupForm
+
+class GroupAddView(UserPassesTestMixin, CreateView):
+
+    model=Group
+    template_name='dashboard/groups/add_groups.html'
+    form_class=GroupForm
+    success_url=reverse_lazy('group_list')
+
+    def test_func(self):
+        return self.request.user.has_perm("auth.add_group")
+    
+    def handle_no_permission(self):
+        if self.request.user.is_autheticated:
+            return HttpResponseForbidden("You are not allowded to add the group")
+        return super().handle_no_permission()
+    
+    def form_valid(self,form):
+        response = super().form_valid(form)   
+
+        messages.success(self.request, f"Group '{form.instance.name}' created successfully!")
+        return response
+
+
+    def form_invalid(self, form):
+        messages.error(self.request, " Failed to create group.")
+        return super().form_invalid(form)
+    
+class GroupUpdateView(UserPassesTestMixin, UpdateView):
+    
+    model=Group 
+    template_name="dashboard/groups/add_groups.html"
+    form_class= GroupForm
+    context_object_name="group"
+    pk_url_kwarg = "pk"
+    success_url=reverse_lazy('group_list')
+
+    def test_func(self):
+        return self.request.user.has_perm("auth.change_group")
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not authorized to update the group")
+        return super().handle_no_permission()
+    
+    def form_valid(self, form):
+        group= form.save(commit=False)
+        group.save()
+
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.warning("Not able to update the group ")
+        response = super().form_invalid(form)
+        return response 
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+       
+        context['groups']=self.get_object()
+        return context
+    
+class GroupDeleteView(UserPassesTestMixin,DeleteView):
+    model=Group
+    template_name="dashboard/groups/delete_groups.html"
+    success_url=reverse_lazy('group_list')
+
+    def test_func(self):
+        return self.request.user.has_perm("auth.delete_group")
+    
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You cannot delete the group ")
+        return super().handle_no_permission()
+    
+    def delete(self, request, *args, **kwargs):
+        group = self.get_object()
+        messages.success(request, " Group '{group.name}' deleted successfully!")
+        return super().delete(request, *args, **kwargs)
+
+from accounts.models import User 
+
+class GroupUserView(UserPassesTestMixin, ListView):
+    model=Group
+    template_name="dashboard/groups/group_users.html"
+    context_object_name="users"
+
+    def test_func(self):
+        return self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return HttpResponseForbidden("You are not allowded to add user to group")
+        return super().handle_no_permission()
+    
+    def get_queryset(self):
+        group_id=self.kwargs['pk']
+        group=Group.objects.get(pk=group_id)
+        return group.user_set.all()   
+
+    def get_group(self):
+        """Return the group instance based on URL pk."""
+        return get_object_or_404(Group, pk=self.kwargs['pk'])
+
+   
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['group'] = self.get_group()  # pass group to template
+        return context
+
+
+ 

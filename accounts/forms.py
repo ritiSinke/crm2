@@ -8,7 +8,7 @@ from django import forms
 
 #  usercreationfrom  le naya user create garn am help garxa 
 # user creation ka lagi form banauna parxa
-# sercreation le email include gardaina 
+# suercreation le email include gardaina 
 
 
 User = get_user_model()
@@ -103,16 +103,24 @@ class UserPermissionForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'is_active', 'is_staff', 'is_superuser', 'permissions']
+        fields = ['permissions']
 
     def save(self, commit=True):
+        
         user = super().save(commit=commit)
-        # set all selected permissions at once
         user.user_permissions.set(self.cleaned_data['permissions'])
         return user
 
 
         
+
+
+from django.contrib.auth.models import Group
+class GroupForm(forms.ModelForm):
+    class Meta:
+        model = Group
+        fields = ["name"]
+
 
 
 from django.contrib.auth.models import Group
@@ -126,4 +134,4 @@ class GroupPermissionForm(forms.ModelForm):
 
     class Meta:
         model = Group
-        fields = ['name', 'permissions']
+        fields = ['permissions']

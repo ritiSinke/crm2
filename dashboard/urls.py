@@ -23,4 +23,18 @@ urlpatterns =[
 
     path('author-post-admin/<int:pk>/', views.AuthorPostAdminView.as_view(), name='author_post_admin'), 
     path('post-sorted-list', views.AuthorPostSortedView.as_view(), name='post_sorted_list'),
+
+
+
+      #  to access the list of groups 
+    path('group-list/', views.GroupListView.as_view(), name='group_list'),
+
+    #  to create group 
+    path('add_group/', views.GroupAddView.as_view(), name="add_group"),
+    #  to update group 
+    path('update-group/<int:pk>/', views.GroupUpdateView.as_view(),name='update_group'),
+    #  to delete group 
+    path('delete-group/<int:pk>/', views.GroupDeleteView.as_view(), name='delete_group'),
+    #  to see ehich user is in the group 
+    path('user-list-group/<int:pk>/', views.GroupUserView.as_view(), name='groups_users')
 ]
